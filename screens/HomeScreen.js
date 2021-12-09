@@ -1,10 +1,46 @@
 import { useNavigation } from '@react-navigation/core';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, StatusBar } from 'react-native';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { showMessage } from "react-native-flash-message";
 
 const HomeScreen = () => {
+
+    const user = auth.currentUser;
+
+    const [loading, setLoading] = useState(true);
+    const [users, setUsers] = useState([]);
+    const [loggedUser, setLoggedUser] = useState();
+    const [fullNameUser, setFullNameUser] = useState("");
+    const [addressUser, setAddressUser] = useState("");
+    
+    useEffect(() => {
+        const getUsersFromFirebase = [];
+        const subscriber = db
+        .collection("users")
+        .onSnapshot((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+            getUsersFromFirebase.push({
+                ...doc.data(),
+                key: doc.id, 
+            });
+            });
+            const loggedUser = getUsersFromFirebase.find(userFromFirebase => user.email === userFromFirebase.email)
+            setLoggedUser(loggedUser)
+            setUsers(getUsersFromFirebase);            
+            setFullNameUser(loggedUser.nume + " " + loggedUser.prenume);
+            setAddressUser(loggedUser.adresa);
+            setLoading(false);
+        });
+    
+        return () => subscriber();
+    }, [loading]);
+
+    var monthArray = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+    var currentMonthIndex = new Date().getMonth();
+    global.currentMonth = monthArray[currentMonthIndex]
+    global.previousMonth = monthArray[currentMonthIndex -1]
 
     const navigation = useNavigation();
 
@@ -17,6 +53,17 @@ const HomeScreen = () => {
             .catch(error => alert(error.message))
     }
 
+    const handleIndexOutOfBounds = () => {
+        showMessage({
+            message: "Va rugam transmiteti indexul in perioada mentionata!",
+            floating: true,
+            position: "top",
+            icon: "info",
+            backgroundColor: "#6b0000",
+            color: "white"
+        });
+    }
+
     const handleIndexPress = () => {
         navigation.navigate("Contoare", { screen: "Index" });
     }
@@ -25,37 +72,56 @@ const HomeScreen = () => {
         navigation.navigate("Informații", { screen: "Info" });
     }
 
+    var currentDay = new Date().getDate();
+    if (currentDay < 20 || currentDay > 26) {
+        global.indexFunction=handleIndexOutOfBounds
+    }
+    else {
+        global.indexFunction = handleIndexPress;
+    }
+
+    global.paymentAmount = 11;      // to be changed with a value from the database
+    var today = currentDay + '/' + (currentMonthIndex + 1) + '/' + new Date().getFullYear();
+    var lastPayDate = '27' + '/' + currentMonthIndex + '/' + new Date().getFullYear();
+    if (today > lastPayDate && global.paymentAmount !== 0) {
+        global.paymentColor = "crimson"
+    } else {
+        global.paymentColor = "black"
+    }
+
     return (
         <View>
             <StatusBar barStyle="dark-content" backgroundColor="#ecf0f1" />
             <View style={styles.greetingView}>
                 <Text style={{color: '#6b0000', fontSize: 28, fontWeight: '600', marginBottom: 10}}>Acasă</Text>
-                <Text style={{fontSize: 17, fontWeight: "500"}}>Bine ai venit, userEmail!</Text>
+                <Text style={{fontSize: 17, fontWeight: "500"}}>Bine ai venit, {fullNameUser}!</Text>
             </View>
             <View style={styles.address}>
                 <View style={styles.iconText}>
                     <FontAwesome5 name="building" size={24} color="black" />
-                    <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>Strada Constantin cel Mare, nr. 80. bl. A12, sc. B, ap. 2 </Text>
+                    <View style={{flex: 1}}>
+                        <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>{addressUser}</Text>
+                    </View>
                 </View>
             </View>
             <View style={styles.address}>
                 <View style={{borderBottomColor: "#6b0000", borderBottomWidth: 2}}>
                     <View style={styles.paymentView}>
                         <Text style={{fontSize: 16, fontWeight:"500"}}>Total de plată:</Text>
-                        <Text style={{fontSize: 16}}>238.13 lei</Text>
+                        <Text style={{fontSize: 16}}>{global.paymentAmount} lei</Text>
                     </View>
                 </View>
                 <View style={styles.iconText}>
                         <Text style={{fontSize: 16, fontWeight:"500", marginTop: 10}}>Dată scadentă:</Text>
-                        <Text style={{fontSize: 16, marginTop: 10}}>27 Octombrie 2021</Text>
+                        <Text style={{fontSize: 16, marginTop: 10, color: global.paymentColor}}>27 {global.previousMonth} 2021</Text>
                 </View>
             </View>
             <View style={styles.address}>
                 <Text style={{fontSize: 16, fontWeight: "500", marginBottom: 10}}>Transmitere index:</Text>
-                <Text style={{fontSize: 15}}>Indexul poate fi transmis în perioada 20 - 26 Noiembrie 2021.</Text>
+                <Text style={{fontSize: 15}}>Indexul poate fi transmis în perioada 20 - 26 {global.currentMonth} {new Date().getFullYear()}.</Text>
                 <TouchableOpacity
                     style={styles.indexButton}
-                    onPress={handleIndexPress}
+                    onPress={global.indexFunction}
                 >
                     <Text style={styles.buttonText}>Transmitere Index</Text>
                 </TouchableOpacity>
