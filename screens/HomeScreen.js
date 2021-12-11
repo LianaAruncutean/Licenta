@@ -7,35 +7,20 @@ import { showMessage } from "react-native-flash-message";
 
 const HomeScreen = () => {
 
-    const user = auth.currentUser;
+    const uid = auth.getUid();
 
-    const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
     const [loggedUser, setLoggedUser] = useState();
-    const [fullNameUser, setFullNameUser] = useState("");
-    const [addressUser, setAddressUser] = useState("");
     
     useEffect(() => {
-        const getUsersFromFirebase = [];
         const subscriber = db
-        .collection("users")
-        .onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-            getUsersFromFirebase.push({
-                ...doc.data(),
-                key: doc.id, 
-            });
-            });
-            const loggedUser = getUsersFromFirebase.find(userFromFirebase => user.email === userFromFirebase.email)
-            setLoggedUser(loggedUser)
-            setUsers(getUsersFromFirebase);            
-            setFullNameUser(loggedUser.nume + " " + loggedUser.prenume);
-            setAddressUser(loggedUser.adresa);
-            setLoading(false);
-        });
-    
+          .collection('users')
+          .doc(uid)
+          .onSnapshot(documentSnapshot => {
+            setLoggedUser(documentSnapshot.data())
+          });
         return () => subscriber();
-    }, [loading]);
+      }, [uid]);
+    global.user = loggedUser;
 
     var monthArray = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
     var currentMonthIndex = new Date().getMonth();
@@ -81,8 +66,9 @@ const HomeScreen = () => {
     }
 
     global.paymentAmount = 11;      // to be changed with a value from the database
-    var today = currentDay + '/' + (currentMonthIndex + 1) + '/' + new Date().getFullYear();
-    var lastPayDate = '27' + '/' + currentMonthIndex + '/' + new Date().getFullYear();
+    
+    var today = new Date(new Date().getFullYear() + '-' + (currentMonthIndex + 1) + '-' + currentDay);
+    var lastPayDate = new Date(new Date().getFullYear() + "-" + currentMonthIndex + '-' + '27');
     if (today > lastPayDate && global.paymentAmount !== 0) {
         global.paymentColor = "crimson"
     } else {
@@ -94,13 +80,13 @@ const HomeScreen = () => {
             <StatusBar barStyle="dark-content" backgroundColor="#ecf0f1" />
             <View style={styles.greetingView}>
                 <Text style={{color: '#6b0000', fontSize: 28, fontWeight: '600', marginBottom: 10}}>Acasă</Text>
-                <Text style={{fontSize: 17, fontWeight: "500"}}>Bine ai venit, {fullNameUser}!</Text>
+                <Text style={{fontSize: 17, fontWeight: "500"}}>Bine ai venit, {global.user?.nume + " " + global.user?.prenume}!</Text>
             </View>
             <View style={styles.address}>
                 <View style={styles.iconText}>
                     <FontAwesome5 name="building" size={24} color="black" />
                     <View style={{flex: 1}}>
-                        <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>{addressUser}</Text>
+                        <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>{global.user?.adresa}</Text>
                     </View>
                 </View>
             </View>
