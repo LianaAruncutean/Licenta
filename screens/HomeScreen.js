@@ -23,7 +23,7 @@ const HomeScreen = () => {
     global.user = loggedUser;
 
     var monthArray = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
-    var currentMonthIndex = new Date().getMonth();
+    global.currentMonthIndex = new Date().getMonth();
     global.currentMonth = monthArray[currentMonthIndex]
     global.previousMonth = monthArray[currentMonthIndex -1]
 
@@ -57,7 +57,7 @@ const HomeScreen = () => {
         navigation.navigate("Informații", { screen: "Info" });
     }
 
-    var currentDay = new Date().getDate();
+    global.currentDay = new Date().getDate();
     if (currentDay < 20 || currentDay > 26) {
         global.indexFunction=handleIndexOutOfBounds
     }
