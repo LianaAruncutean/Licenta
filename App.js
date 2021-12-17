@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
 import BottomTabNavigator from "./navigation/TabNavigator";
 import FlashMessage from "react-native-flash-message";
+import CameraScreen from './screens/CameraScreen';
+import PreviewPhotoScreen from './screens/PreviewPhotoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -13,6 +15,8 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen options={ {headerShown: false} } name="Login" component={LoginScreen} />
+        <Stack.Screen options={ {headerShown: false} } name="CameraScreen" component={CameraScreen}/>
+        <Stack.Screen options={ {headerShown: false} } name="PreviewPhotoScreen" component={PreviewPhotoScreen}/>
         <Stack.Screen options={ {headerShown: false} } name="Tab" component={BottomTabNavigator} />
       </Stack.Navigator>
       <FlashMessage position="top" />
