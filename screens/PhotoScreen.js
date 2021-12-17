@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 
 const PhotoScreen = () => {
@@ -11,7 +11,7 @@ const PhotoScreen = () => {
     }
 
     const handleTakePhoto = () => {
-        console.log("deschide camera");
+        navigation.navigate("CameraScreen");
     }
 
     return (
