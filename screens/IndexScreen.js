@@ -13,17 +13,17 @@ const IndexScreen = () => {
     const navigation = useNavigation();
 
     const [receBaie, setReceBaie] = useState(undefined);
-    const [caldaBaie, setCaldaBaie] = useState(undefined);
+    const [caldaBaie, setCaldaBaie] = useState(0);
     const [receBucatarie, setReceBucatarie] = useState(undefined);
-    const [caldaBucatarie, setCaldaBucatarie] = useState(undefined);
+    const [caldaBucatarie, setCaldaBucatarie] = useState(0);
     const [docExist, setDocExist] = useState(false);
 
     const doc = (global.currentMonthIndex + 1) + '-' + new Date().getFullYear();
 
-    if (global.user.hasCentrala === false) {
-        global.display = "none";
+    if (global.user.hasCentrala === true) {
+        global.displayCald = "none";
     } else {
-        global.display = "flex";
+        global.displayCald = "flex";
     }
 
     db.collection('index').doc(uid).collection('indexList').doc(doc)
@@ -37,7 +37,7 @@ const IndexScreen = () => {
         global.disabled = "none";
         global.messageExists = "flex";
         global.messageIndexOutOfBounds = "none";
-            global.messageIndexOk = "none";
+        global.messageIndexOk = "none";
     } else {
         if (currentDay < 20 || currentDay > 26) {
             global.messageIndexOutOfBounds = "flex";
@@ -54,7 +54,7 @@ const IndexScreen = () => {
     }
 
     const handleIndexPress = () => {
-        if (!hasValue(receBucatarie) || !hasValue(caldaBucatarie) || ! hasValue(receBaie) || !hasValue(caldaBaie)) {
+        if (!hasValue(receBucatarie) || !hasValue(caldaBucatarie) || !hasValue(receBaie) || !hasValue(caldaBaie)) {
             showMessage({
                 message: "Vă rugăm introduceți valorile tuturor contoarelor!",
                 floating: true,
@@ -120,7 +120,7 @@ const IndexScreen = () => {
                                 keyboardType='numeric'
                             />
                         </View>
-                        <View style={{marginBottom: 20, display: global.display}}>
+                        <View style={{marginBottom: 20, display: global.displayCald}}>
                             <View style={styles.iconText}>
                                 <MaterialIcons name="kitchen" size={20} color="black" />
                                 <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>APĂ CALDĂ bucătărie:</Text>
@@ -147,7 +147,7 @@ const IndexScreen = () => {
                             />
                         </View>
                         
-                        <View style={{display: global.display}}>
+                        <View style={{display: global.displayCald}}>
                             <View style={styles.iconText}>
                                 <MaterialIcons name="bathtub" size={20} color="black" />
                                 <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>APĂ CALDA baie:</Text>
