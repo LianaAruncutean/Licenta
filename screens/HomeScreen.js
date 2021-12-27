@@ -86,7 +86,7 @@ const HomeScreen = () => {
                 <View style={styles.iconText}>
                     <FontAwesome5 name="building" size={24} color="black" />
                     <View style={{flex: 1}}>
-                        <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>{global.user?.adresa}</Text>
+                        <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>{global.user?.adresa + ", ap. " + global.user?.apartament}</Text>
                     </View>
                 </View>
             </View>
