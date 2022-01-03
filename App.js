@@ -7,6 +7,7 @@ import BottomTabNavigator from "./navigation/TabNavigator";
 import FlashMessage from "react-native-flash-message";
 import CameraScreen from './screens/CameraScreen';
 import PreviewPhotoScreen from './screens/PreviewPhotoScreen';
+import HomeScreenAdmin from './screens/HomeScreenAdmin';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,9 +16,10 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen options={ {headerShown: false} } name="Login" component={LoginScreen} />
-        <Stack.Screen options={ {headerShown: false} } name="CameraScreen" component={CameraScreen}/>
+        {/* <Stack.Screen options={ {headerShown: false} } name="CameraScreen" component={CameraScreen}/>
         <Stack.Screen options={ {headerShown: false} } name="PreviewPhotoScreen" component={PreviewPhotoScreen}/>
-        <Stack.Screen options={ {headerShown: false} } name="Tab" component={BottomTabNavigator} />
+        <Stack.Screen options={ {headerShown: false} } name="Tab" component={BottomTabNavigator} /> */}
+        <Stack.Screen options={ {headerShown: false} } name="HomeAdmin" component={HomeScreenAdmin} />
       </Stack.Navigator>
       <FlashMessage position="top" />
     </NavigationContainer>

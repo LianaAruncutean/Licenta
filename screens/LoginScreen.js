@@ -13,7 +13,8 @@ const LoginScreen = () => {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
           if (user) {
-            navigation.navigate("Tab");
+            navigation.navigate("HomeAdmin");
+            // navigation.navigate("Tab");
           }
         })
         return unsubscribe
