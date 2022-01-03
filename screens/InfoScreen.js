@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import Announcement from "./announcement";
+import Announcement from "./Announcement";
 import { db } from "../firebase";
 
 const InfoScreen = () => {
