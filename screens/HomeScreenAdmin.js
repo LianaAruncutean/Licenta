@@ -7,11 +7,9 @@ import {
   View,
   StatusBar,
   FlatList,
-  Picker,
 } from "react-native";
 import { auth, db } from "../firebase";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
 import Announcement from "./Announcement";
 import DropDownPicker from "react-native-dropdown-picker";
 
@@ -83,23 +81,7 @@ const HomeScreenAdmin = () => {
     global.displayAnn = "flex";
   }
 
-  var monthArray = [
-    "Ianuarie",
-    "Februarie",
-    "Martie",
-    "Aprilie",
-    "Mai",
-    "Iunie",
-    "Iulie",
-    "August",
-    "Septembrie",
-    "Octombrie",
-    "Noiembrie",
-    "Decembrie",
-  ];
-  global.currentMonthIndex = new Date().getMonth();
-  global.currentMonth = monthArray[currentMonthIndex];
-  global.previousMonth = monthArray[currentMonthIndex - 1];
+  global.currentAddress = selectedAddress;
 
   const navigation = useNavigation();
 
@@ -111,6 +93,10 @@ const HomeScreenAdmin = () => {
       })
       .catch((error) => alert(error.message));
   };
+
+  const displayTenantList = () => {
+      navigation.navigate("TenantsList");
+  }
 
   return (
     <View>
@@ -139,7 +125,6 @@ const HomeScreenAdmin = () => {
             style={{ marginRight: 10 }}
           />
           <View style={{ flex: 1 }}>
-            {/* <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>{global.user?.adresa}</Text> */}
             <DropDownPicker
               open={open}
               value={selectedAddress}
@@ -149,15 +134,9 @@ const HomeScreenAdmin = () => {
               setItems={setAdrese}
             />
           </View>
-          {/* <TouchableOpacity>
-                    <MaterialIcons name="keyboard-arrow-down" size={24} color="black"/>
-                    </TouchableOpacity> */}
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.indexButton}
-        onPress={global.indexFunction}
-      >
+      <TouchableOpacity style={styles.indexButton} onPress={displayTenantList}>
         <Text style={styles.buttonText}>Vezi Locatari</Text>
       </TouchableOpacity>
       <View style={styles.address}>
@@ -184,11 +163,12 @@ const HomeScreenAdmin = () => {
         <FlatList
           data={anunturi}
           renderItem={({ item }) => <Announcement item={item}></Announcement>}
+          keyExtractor={(item) => item.data}
         />
       </View>
       <TouchableOpacity
         style={styles.indexButton}
-        onPress={global.indexFunction}
+        onPress={()=> console.log("-fe")}
       >
         <Text style={styles.buttonText}>Adaugă anunț</Text>
       </TouchableOpacity>
