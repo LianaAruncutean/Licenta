@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
   StatusBar,
-  FlatList,
+  FlatList, Modal, Pressable, TextInput, Keyboard, TouchableWithoutFeedback
 } from "react-native";
 import { auth, db } from "../firebase";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -20,6 +20,10 @@ const HomeScreenAdmin = () => {
   const [adrese, setAdrese] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
 
   useEffect(() => {
     if (uid) {
@@ -37,6 +41,7 @@ const HomeScreenAdmin = () => {
               querySnapshot.forEach((documentSnapshot) => {
                 const anunt = documentSnapshot.data();
                 anunturiTotal.push(anunt);
+                anunturiTotal.sort((a, b) => (a.date > b.date) ? 1 : -1)
               });
               setAnunturi(anunturiTotal);
             });
@@ -70,7 +75,7 @@ const HomeScreenAdmin = () => {
         });
       return () => subscriber();
     }
-  }, [uid, global.user?.adresa]);
+  }, [uid, global.user?.adresa, anunturi]);
   global.user = loggedUser;
 
   if (anunturi.length === 0) {
@@ -96,6 +101,39 @@ const HomeScreenAdmin = () => {
 
   const displayTenantList = () => {
       navigation.navigate("TenantsList");
+  }
+
+  const addAnnouncement = () => {
+      setModalVisible(true)
+  }
+
+  const addAnnouncementToDB = () => {
+    console.log(title + " "  + description)
+    const currentDate = new Date();
+    var currentDay = null;
+    if (currentDate.getDate() < 10) {
+      currentDay = "0" + currentDate.getDate();
+    } else {
+      currentDay = currentDate.getDate();
+    }
+    var currentMonth = null;
+    if (currentDate.getMonth() < 10) {
+      currentMonth = "0" + (currentDate.getMonth() + 1);
+    } else {
+      currentMonth = currentDate.getMonth() + 1
+    }
+    const dateDB = currentDay + "/" + currentMonth + "/" + currentDate.getFullYear()
+    console.log(dateDB)
+    db.collection("address").doc(selectedAddress).collection("announcements")
+    .add({
+      data: dateDB,
+      text: description,
+      titlu: title
+    })
+    .then(() => console.log("Announcement added"))
+    setTitle(null);
+    setDescription(null);
+    setModalVisible(!modalVisible)
   }
 
   return (
@@ -163,12 +201,12 @@ const HomeScreenAdmin = () => {
         <FlatList
           data={anunturi}
           renderItem={({ item }) => <Announcement item={item}></Announcement>}
-          keyExtractor={(item) => item.data}
+          keyExtractor={(item) => item.data + Math.random(10000)}
         />
       </View>
       <TouchableOpacity
         style={styles.indexButton}
-        onPress={()=> console.log("-fe")}
+        onPress={addAnnouncement}
       >
         <Text style={styles.buttonText}>Adaugă anunț</Text>
       </TouchableOpacity>
@@ -177,6 +215,55 @@ const HomeScreenAdmin = () => {
           <Text style={styles.buttonTextSignOut}>Deconectare</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.centeredView}>
+                <Modal animationType="slide" transparent={true} visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert("closed")
+                    setModalVisible(!modalVisible);
+                }}>
+                  <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                          <Text style={{fontSize: 18, fontWeight: "500", marginBottom: 15, color: "#6b0000"}}>Adăuagare anunț</Text>
+                          <View style={{marginBottom: 10}}>
+                              <View style={styles.iconText}>
+                                  <Text style={styles.inputTitle}>Titlu: </Text>
+                                  <TextInput 
+                                      value={title}
+                                      onChangeText={text => setTitle(text)}
+                                      style={styles.inputTitleBox}
+                                  />
+                              </View>
+                              <View style={styles.iconText}>
+                                  <Text style={styles.inputTitle}>Descriere: </Text>
+                                  <TextInput 
+                                      multiline
+                                      numberOfLines={12}
+                                      value={description}
+                                      onChangeText={text => setDescription(text)}
+                                      style={styles.inputDescriptionBox}
+                                  />
+                              </View>
+                            </View>
+                            <View style={styles.iconText}>
+                              <Pressable
+                                style={[styles.buttonModal, styles.buttonAdd, {marginRight: 20}]}
+                                onPress={() => setModalVisible(!modalVisible)}
+                                >
+                                <Text style={styles.buttonTextSignOut}>Închide</Text>
+                              </Pressable>
+                              <Pressable
+                                style={[styles.buttonModal, styles.buttonClose]}
+                                onPress={addAnnouncementToDB}
+                                >
+                                <Text style={styles.buttonText}>Adaugă anunț</Text>
+                              </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                    </TouchableWithoutFeedback>
+                </Modal>
+            </View>
     </View>
   );
 };
@@ -209,6 +296,7 @@ const styles = StyleSheet.create({
       width: 1,
     },
     zIndex: 99,
+    maxHeight: 200
   },
   button: {
     backgroundColor: "white",
@@ -216,7 +304,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 30,
     marginLeft: 30,
     borderWidth: 1,
     borderColor: "#6b0000",
@@ -241,4 +329,69 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textTransform: "uppercase",
   },
+  modalView: {
+    marginTop: 70,
+    marginHorizontal: 30,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+    },
+modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+},
+buttonModal: {
+    borderRadius: 20,
+    padding: 10,
+    paddingHorizontal: 15,
+    elevation: 2,
+    marginTop: 10
+  },
+buttonClose: {
+    backgroundColor: "#6b0000",
+},
+buttonAdd: {
+    backgroundColor: "white",
+    borderColor: "#6b0000",
+    borderWidth: 1
+},
+inputTitleBox: {
+  backgroundColor: "white",
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  borderRadius: 10,
+  marginTop: 10,
+  borderColor: "#ddd",
+  borderWidth: 1,
+  width: "85%",
+  height: "70%",
+  marginLeft: 25,
+},
+inputTitle: {
+  fontSize: 16,
+  marginTop: 7,
+  marginLeft: -14,
+  fontWeight: "500",
+  color: "black"
+},
+inputDescriptionBox: {
+  backgroundColor: "white",
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  borderRadius: 10,
+  marginTop: 10,
+  borderColor: "#ddd",
+  borderWidth: 1,
+  width: "71%",
+  marginLeft: 25
+},
 });
