@@ -10,6 +10,8 @@ import PreviewPhotoScreen from './screens/PreviewPhotoScreen';
 import HomeScreenAdmin from './screens/HomeScreenAdmin';
 import TenantsListScreen from './screens/TenantsListScreen';
 import TenantDetail from './screens/TenantDetail';
+import LandingScreen from './screens/LandingScreen';
+import AdminBottomTabNavigator from './navigation/AdminTabNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,13 +19,15 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen options={ {headerShown: false} } name="Landing" component={LandingScreen} />
         <Stack.Screen options={ {headerShown: false} } name="Login" component={LoginScreen} />
-        {/* <Stack.Screen options={ {headerShown: false} } name="CameraScreen" component={CameraScreen}/>
+        <Stack.Screen options={ {headerShown: false} } name="CameraScreen" component={CameraScreen}/>
         <Stack.Screen options={ {headerShown: false} } name="PreviewPhotoScreen" component={PreviewPhotoScreen}/>
-        <Stack.Screen options={ {headerShown: false} } name="Tab" component={BottomTabNavigator} /> */}
-        <Stack.Screen options={ {headerShown: false} } name="HomeAdmin" component={HomeScreenAdmin} />
+        <Stack.Screen options={ {headerShown: false} } name="Tab" component={BottomTabNavigator} />
+        <Stack.Screen options={ {headerShown: false} } name="AdminTab" component={AdminBottomTabNavigator} />
+        {/* <Stack.Screen options={ {headerShown: false} } name="HomeAdmin" component={HomeScreenAdmin} />
         <Stack.Screen options={ {headerShown: false} } name="TenantsList" component={TenantsListScreen} />
-        <Stack.Screen options={ {headerShown: false} } name="TenantDetail" component={TenantDetail} />
+        <Stack.Screen options={ {headerShown: false} } name="TenantDetail" component={TenantDetail} /> */}
       </Stack.Navigator>
       <FlashMessage position="top" />
     </NavigationContainer>

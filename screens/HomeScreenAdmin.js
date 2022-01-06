@@ -75,7 +75,7 @@ const HomeScreenAdmin = () => {
         });
       return () => subscriber();
     }
-  }, [uid, global.user?.adresa, anunturi]);
+  }, [uid, global.user?.adresa]);
   global.user = loggedUser;
 
   if (anunturi.length === 0) {
@@ -95,12 +95,13 @@ const HomeScreenAdmin = () => {
       .signOut()
       .then(() => {
         navigation.navigate("Login");
+        console.log(auth.getUid())
       })
       .catch((error) => alert(error.message));
   };
 
   const displayTenantList = () => {
-      navigation.navigate("TenantsList");
+    navigation.navigate("Listă", { screen: "TenantsList" });
   }
 
   const addAnnouncement = () => {
