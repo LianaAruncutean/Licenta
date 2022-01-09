@@ -18,8 +18,8 @@ const HomeAdminTabStackNavigator = () => {
 const ListTabStackNavigator = () => {
     return (
         <Stack.Navigator>
-        <Stack.Screen options={ {headerShown: false} } name="TenantsList" component={TenantsListScreen} />
-        <Stack.Screen options={ {headerShown: false} } name="HomeAdmin" component={HomeScreenAdmin} />
+            <Stack.Screen options={ {headerShown: false} } name="TenantsList" component={TenantsListScreen} />
+            <Stack.Screen options={ {headerShown: false} } name="HomeAdmin" component={HomeScreenAdmin} />
             <Stack.Screen options={ {headerShown: false} } name="TenantDetail" component={TenantDetail} />
         </Stack.Navigator>
     )

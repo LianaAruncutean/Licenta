@@ -36,6 +36,14 @@ const InfoScreen = () => {
       });
   }, []);
 
+  if (anunturi.length === 0) {
+    global.displayTextAnn = "flex";
+    global.displayAnn = "none";
+  } else {
+    global.displayTextAnn = "none";
+    global.displayAnn = "flex";
+  }
+
   return (
     <View>
       <StatusBar barStyle="dark-content" backgroundColor="#ecf0f1" />
@@ -126,10 +134,20 @@ const InfoScreen = () => {
         >
           Anunțuri de interes general:
         </Text>
-        {/* <Text style={{fontSize: 15, textAlign: "justify", color: "#ddd"}}>Niciun anunț nu a fost postat încă!</Text> */}
+        <Text
+          style={{
+            fontSize: 15,
+            textAlign: "justify",
+            color: "#ddd",
+            display: global.displayTextAnn,
+          }}
+        >
+          Niciun anunț nu a fost postat încă!
+        </Text>
         <FlatList
           data={anunturi}
           renderItem={({ item }) => <Announcement item={item}></Announcement>}
+          keyExtractor={(item) => item.data + Math.random(10000)}
         />
       </View>
       <TouchableOpacity style={styles.buttonPhoto} onPress={backToHome}>
@@ -177,7 +195,7 @@ const styles = StyleSheet.create({
       height: 1,
       width: 1,
     },
-    height: 200,
+    maxHeight: 200,
   },
   buttonPhoto: {
     backgroundColor: "white",

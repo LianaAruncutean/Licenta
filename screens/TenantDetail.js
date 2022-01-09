@@ -55,7 +55,6 @@ const TenantDetail = ( {route} ) => {
                 }
                 listOfMonths.push(monthObject);
             })
-            
             setItems(listOfMonths)
 
             if (value) {
@@ -75,11 +74,9 @@ const TenantDetail = ( {route} ) => {
     useEffect(() => {
         const photoDate = (monthArray.indexOf(value) + 1) +  "-" + "2021";
         const photoName = global.uid.id + "_" + photoDate;
-        console.log(photoName);
         const imageRef = firebase.storage().ref(photoName);
         // const url = await ref.getDownloadURL();
         imageRef.getDownloadURL().then((url) => {
-            console.log(url)
             setImageURL(url)
         })
         .catch((e) => console.log('getting downloadURL of image error => ', e)); 
@@ -92,8 +89,6 @@ const TenantDetail = ( {route} ) => {
         global.displayDisplayPhoto = "none";
         global.displayRequestPhoto = "flex";
     }
-    console.log("Viz: " + global.displayDisplayPhoto);
-    console.log("Sol: " + global.displayRequestPhoto)
 
     global.currentTenant = tenant;
     if (global.currentTenant) {
@@ -153,7 +148,7 @@ const TenantDetail = ( {route} ) => {
                 <View style={{marginTop: 10}}>
                     <View style={styles.iconText}>
                         <Text  style={{fontSize: 15, fontWeight: '500'}}>Nume: </Text>
-                        <Text  style={{fontSize: 15, fontWeight: '500', color: "crimson"}}>{global.currentTenant?.nume}</Text>
+                        <Text  style={{fontSize: 15, fontWeight: '500', color: "crimson"}}>{global.currentTenant?.nume + " " + global.currentTenant?.prenume}</Text>
                     </View>
                 </View>
                 <View style={{marginTop: 10, marginBottom: 10}}>
