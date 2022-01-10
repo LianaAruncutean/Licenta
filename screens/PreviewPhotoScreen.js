@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import * as firebase from "firebase";
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { showMessage } from "react-native-flash-message";
 
 const PreviewPhotoScreen = () => {
@@ -26,6 +26,7 @@ const PreviewPhotoScreen = () => {
 
     const sendPhoto = () => {
         uploadImage(global.image.uri, uid + "_" + doc)
+        db.collection("users").doc(uid).update({hasToPhoto: false})
         .then(() => {
             showMessage({
                 message: "Poza doveditoare a fost transmisă către administrator cu succes!",

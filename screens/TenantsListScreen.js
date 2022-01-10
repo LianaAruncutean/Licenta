@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/core";
 import {
   StyleSheet,
@@ -12,14 +13,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { db } from "../firebase";
 
 const TenantsListScreen = () => {
-  const [tenantsDetails, setTenantsDetails] = useState([]);
 
-  useEffect(() => {
-    db.collection("address")
+  const [tenantsDetails, setTenantsDetails] = useState([]);
+  var adresa = global.currentAddress
+
+  useFocusEffect(
+    React.useCallback(() => {
+      db.collection("address")
       .doc(global.currentAddress)
       .collection("tenants")
       .get()
       .then((querySnapshot) => {
+        console.log(global.currentAddress)
         const tenantsArray = [];
         querySnapshot.forEach((documentSnapshot) => {
           db.collection("users")
@@ -27,17 +32,21 @@ const TenantsListScreen = () => {
             .onSnapshot((documentSnapshotTenant) => {
               tenantsArray.push(documentSnapshotTenant.data());
               tenantsArray[tenantsArray.length - 1].id = documentSnapshotTenant.id;
+              tenantsArray.sort((a, b) => (a.apartament > b.apartament) ? 1 : -1)
               setTenantsDetails(tenantsArray);
             });
         });
       });
-  }, [global.currentAddress]);
+      return () => {
+      };
+    }, [])
+  );
 
   const navigation = useNavigation();
 
   const Item = ({ item, onPress }) => {
     return (
-      <View style={styles.container}>
+      <View>
         <View style={styles.iconText}>
           <View style={{ marginBottom: 5 }}>
             <Ionicons name="person" size={18} color="black" />
@@ -68,6 +77,7 @@ const TenantsListScreen = () => {
       />
     );
   };
+  
 
   return (
     <View>

@@ -27,13 +27,14 @@ const HomeScreenAdmin = () => {
 
   useEffect(() => {
     if (uid) {
-      const subscriber = db
+      if(selectedAddress) {
+        db
         .collection("users")
         .doc(uid)
         .onSnapshot((documentSnapshot) => {
           setLoggedUser(documentSnapshot.data());
           db.collection("address")
-            .doc(global.user?.adresa)
+            .doc(selectedAddress)
             .collection("announcements")
             .get()
             .then((querySnapshot) => {
@@ -45,8 +46,10 @@ const HomeScreenAdmin = () => {
               });
               setAnunturi(anunturiTotal);
             });
-        });
+        });}
 
+      }
+      
       db.collection("address")
         .get()
         .then((querySnapshot) => {
@@ -69,15 +72,15 @@ const HomeScreenAdmin = () => {
                   }
                 });
                 setAdrese(totalAdrese);
-                setSelectedAddress(totalAdrese[0].label);
+                if (selectedAddress === null) {
+                  setSelectedAddress(totalAdrese[0].label)
+                }
               });
           });
         });
-      return () => subscriber();
-    }
-  }, [uid, global.user?.adresa, anunturi]);
+  }, [uid, global.user?.adresa, selectedAddress]);
   global.user = loggedUser;
-
+  
   if (anunturi.length === 0) {
     global.displayTextAnn = "flex";
     global.displayAnn = "none";
@@ -95,12 +98,13 @@ const HomeScreenAdmin = () => {
       .signOut()
       .then(() => {
         navigation.navigate("Login");
+        console.log(auth.getUid())
       })
       .catch((error) => alert(error.message));
   };
 
   const displayTenantList = () => {
-      navigation.navigate("TenantsList");
+    navigation.navigate("Listă", { screen: "TenantsList", initial: false });
   }
 
   const addAnnouncement = () => {
