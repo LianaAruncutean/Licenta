@@ -20,6 +20,9 @@ const TenantDetail = ( {route} ) => {
     
     const [modalVisible, setModalVisible] = useState(false);
 
+    var monthArray = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+    var currentMonth = monthArray[new Date().getMonth()]
+
     useEffect(() => {
         db.collection("users").doc(global.uid.id)
         .onSnapshot(documentSnapshot => {
@@ -58,10 +61,19 @@ const TenantDetail = ( {route} ) => {
             setItems(listOfMonths)
 
             if (value) {
-                const docMonth = monthArray.indexOf(value) + 1;
-                const docValue = docMonth + '-' + '2021'
+                var docYear, docMonth;
+                var docMonth = monthArray.indexOf(value) + 1;
+                if (docMonth < 10) {
+                    docMonth = "0" + docMonth
+                }
+                if (monthArray.indexOf(value) > new Date().getMonth()) {
+                    docYear = new Date().getFullYear() -1;
+                } else {
+                    docYear = new Date().getFullYear();
+                }
+                const docValue = docMonth + '-' + docYear;
                 const indexToDelete = ((monthArray.indexOf(value)-12))
-                setValue(listOfMonths[listOfMonths.length + indexToDelete].label)
+                // setValue(listOfMonths[listOfMonths.length + indexToDelete].label)
                 if (docValue) {db.collection("index").doc(global.uid.id).collection("indexList").doc(docValue)
                 .onSnapshot(documentSnapshot => {
                     setIndex(documentSnapshot.data())
@@ -72,11 +84,30 @@ const TenantDetail = ( {route} ) => {
     },[indexList, value])
 
     useEffect(() => {
-        const photoDate = (monthArray.indexOf(value) + 1) +  "-" + "2021";
+        var photoMonth = null
+        if (monthArray.indexOf(value) < 10) {
+            photoMonth = "0" + (monthArray.indexOf(value) + 1)
+        } else {
+            photoMonth = monthArray.indexOf(value) + 1
+        }
+        // if (photoMonth) {
+        //     if (photoMonth.startsWith("00")) {
+        //         photoMonth = photoMonth.substring(1)
+        //     }
+        // }
+        var photoYear = null;
+        if (value > currentMonth) {
+            photoYear = new Date().getFullYear() - 1
+        } else {
+            photoYear = new Date().getFullYear()
+        }
+        console.log(monthArray.indexOf(value))
+        const photoDate = photoMonth +  "-" + photoYear;
         const photoName = global.uid.id + "_" + photoDate;
         const imageRef = firebase.storage().ref(photoName);
         // const url = await ref.getDownloadURL();
         imageRef.getDownloadURL().then((url) => {
+            console.log(url)
             setImageURL(url)
         })
         .catch((e) => console.log('getting downloadURL of image error => ', e)); 
@@ -89,6 +120,10 @@ const TenantDetail = ( {route} ) => {
         global.displayDisplayPhoto = "none";
         global.displayRequestPhoto = "flex";
     }
+
+    if (currentMonth !== value) {
+        global.displayRequestPhoto = "none";
+    } 
 
     global.currentTenant = tenant;
     if (global.currentTenant) {

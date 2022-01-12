@@ -10,7 +10,6 @@ getTabBarVisibility = (route) => {
       ? route.state.routes[route.state.index].name
       : '';
   
-      console.log(routeName);
     if (routeName === "Login") {
       return false;
     }

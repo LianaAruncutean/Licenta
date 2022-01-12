@@ -15,7 +15,6 @@ import { db } from "../firebase";
 const TenantsListScreen = () => {
 
   const [tenantsDetails, setTenantsDetails] = useState([]);
-  var adresa = global.currentAddress
 
   useFocusEffect(
     React.useCallback(() => {
@@ -24,7 +23,6 @@ const TenantsListScreen = () => {
       .collection("tenants")
       .get()
       .then((querySnapshot) => {
-        console.log(global.currentAddress)
         const tenantsArray = [];
         querySnapshot.forEach((documentSnapshot) => {
           db.collection("users")

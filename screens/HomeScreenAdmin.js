@@ -12,6 +12,7 @@ import { auth, db } from "../firebase";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Announcement from "./Announcement";
 import DropDownPicker from "react-native-dropdown-picker";
+import { showMessage } from "react-native-flash-message";
 
 const HomeScreenAdmin = () => {
   const [uid, setUid] = useState(auth.getUid());
@@ -42,7 +43,7 @@ const HomeScreenAdmin = () => {
               querySnapshot.forEach((documentSnapshot) => {
                 const anunt = documentSnapshot.data();
                 anunturiTotal.push(anunt);
-                anunturiTotal.sort((a, b) => (a.date > b.date) ? 1 : -1)
+                anunturiTotal.sort((a, b) => (a.data < b.data) ? 1 : -1)
               });
               setAnunturi(anunturiTotal);
             });
@@ -93,12 +94,17 @@ const HomeScreenAdmin = () => {
 
   const navigation = useNavigation();
 
+  const clearEverything = () => {
+    global.user, global.displayTextAnn, global.displayAnn, global.currentAddress, global.uid, global.displayRequestPhoto, 
+    global.displayDisplayPhoto, global.currentTenant, global.displayCald, global.displayButtonValue, global.imageView = undefined
+  }
+
   const handleSignout = () => {
     auth
       .signOut()
       .then(() => {
+        clearEverything()
         navigation.navigate("Login");
-        console.log(auth.getUid())
       })
       .catch((error) => alert(error.message));
   };
@@ -112,7 +118,6 @@ const HomeScreenAdmin = () => {
   }
 
   const addAnnouncementToDB = () => {
-    console.log(title + " "  + description)
     const currentDate = new Date();
     var currentDay = null;
     if (currentDate.getDate() < 10) {
@@ -127,7 +132,6 @@ const HomeScreenAdmin = () => {
       currentMonth = currentDate.getMonth() + 1
     }
     const dateDB = currentDay + "/" + currentMonth + "/" + currentDate.getFullYear()
-    console.log(dateDB)
     db.collection("address").doc(selectedAddress).collection("announcements")
     .add({
       data: dateDB,
@@ -138,6 +142,14 @@ const HomeScreenAdmin = () => {
     setTitle(null);
     setDescription(null);
     setModalVisible(!modalVisible)
+    showMessage({
+      message: "Anunțul dumneavoastră a fost postat!",
+      floating: true,
+      position: "top",
+      icon: "info",
+      backgroundColor: "#6b0000",
+      color: "white",
+    });
   }
 
   return (

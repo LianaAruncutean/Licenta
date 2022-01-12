@@ -32,13 +32,10 @@ const LoginScreen = () => {
             .doc(uid)
             .get()
             .then((documentSnapshot) => {
-              console.log("User exists: ", documentSnapshot.exists);
               if (documentSnapshot.exists === true) {
                 setIsAdmin(true);
-                console.log("admin");
                 navigation.navigate("AdminTab");
               } else {
-                console.log("tab");
                 navigation.navigate("Tab");
               }
             });
