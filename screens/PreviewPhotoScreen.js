@@ -8,7 +8,9 @@ import { showMessage } from "react-native-flash-message";
 const PreviewPhotoScreen = () => {
 
     const uid = auth.getUid();
-    const doc = (global.currentMonthIndex + 1) + '-' + new Date().getFullYear();
+    var monthIndexArray = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    var month = monthIndexArray[new Date().getMonth()]
+    const doc = month + '-' + new Date().getFullYear();
 
     const navigation = useNavigation();
 
@@ -55,7 +57,7 @@ const PreviewPhotoScreen = () => {
                     style={styles.button}
                     onPress={backToCamera}
                 >
-                    <Text style={styles.buttonTextSignOut}>Reîncearca</Text>
+                    <Text style={styles.buttonTextSignOut}>Reîncearcă</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.buttonSend}

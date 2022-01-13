@@ -7,13 +7,15 @@ import {
   View,
   StatusBar,
 } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import { auth, db } from "../firebase";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { showMessage } from "react-native-flash-message";
 
 const HomeScreen = () => {
-  const uid = auth.getUid();
 
+  const uid = auth.getUid();
+  const [paymentTotal, setPaymentTotal] = useState();
   const [loggedUser, setLoggedUser] = useState();
 
   useEffect(() => {
@@ -26,6 +28,47 @@ const HomeScreen = () => {
     return () => subscriber();
   }, [uid]);
   global.user = loggedUser;
+
+  useFocusEffect(
+    React.useCallback(() => {
+    if (global.currentMonthIndex < 10) {
+      global.currentMonthIndex = "0" + global.currentMonthIndex
+    }
+    var docCurrent = (global.currentMonthIndex + 1) + '-' + new Date().getFullYear();
+    if (docCurrent.startsWith("00")) {
+      docCurrent = docCurrent.substring(1)
+    }
+    var docPreviousYear, docPreviousMonth
+    if (global.currentMonthIndex ==  0) {
+      docPreviousYear = new Date().getFullYear() - 1;
+      docPreviousMonth = 12
+    }
+    var docPrevious = docPreviousMonth + "-" + docPreviousYear
+    console.log(docPrevious + "    " + docCurrent)
+    db.collection("index").doc(uid).collection("indexList").doc(docCurrent)
+    .get()
+    .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          db.collection("index").doc(uid).collection("indexList").doc(docPrevious)
+          .onSnapshot(documentSnapshotPrev => {
+            const prevIndex = documentSnapshotPrev.data()
+            db.collection("index").doc(uid).collection("indexList").doc(docCurrent)
+            .onSnapshot(documentSnapshotCurrent => {
+              const currIndex = documentSnapshotCurrent.data()
+              var paymentValue;
+              paymentValue = (currIndex.receBaie - prevIndex.receBaie) * 2 + (currIndex.receBucatarie - prevIndex.receBucatarie) * 2
+                                    + (currIndex.caldaBaie - prevIndex.caldaBaie) * 2 + (currIndex.caldaBucatarie - prevIndex.caldaBucatarie) * 2;
+              setPaymentTotal(paymentValue)
+            })
+          })
+          
+        } else {
+          setPaymentTotal("-");
+        }
+        console.log(paymentTotal)
+    });
+  }, [])
+  )
 
   var monthArray = [
     "Ianuarie",
@@ -48,10 +91,20 @@ const HomeScreen = () => {
 
   const navigation = useNavigation();
 
+  const clearEverything = () => {
+    // global.image, global.currentMonthIndex, global.paymentTotal, global.currentMonth, global.previousMonth,
+    // global.currentDay, global.indexFunction, global.currentYear, global.limitMonth, global.displayCald, global.disabled
+    // global.messageExists, global.messageIndexOk, global.messageIndexOutOfBounds, global.displayAnn, global.displayTextAnn,
+    // global.displayRequestedPhoto, global.displayNotRequested = undefined
+    loggedUser = undefined
+  }
+
   const handleSignout = () => {
     auth
       .signOut()
       .then(() => {
+        // setLoggedUser(undefined)
+        // console.log(user)
         navigation.navigate("Login");
       })
       .catch((error) => alert(error.message));
@@ -77,13 +130,17 @@ const HomeScreen = () => {
   };
 
   global.currentDay = new Date().getDate();
-  if (currentDay < 20 || currentDay > 26) {
+  if (currentDay < 10 || currentDay > 15) {
     global.indexFunction = handleIndexOutOfBounds;
   } else {
     global.indexFunction = handleIndexPress;
   }
 
-  global.paymentAmount = 11; // to be changed with a value from the database
+  if (global.previousMonth == "Decembrie") {
+    global.currentYear = new Date().getFullYear() -1 
+  } else {
+    global.currentYear = new Date().getFullYear()
+  }
 
   var today = new Date(
     new Date().getFullYear() + "-" + (currentMonthIndex + 1) + "-" + currentDay
@@ -91,10 +148,17 @@ const HomeScreen = () => {
   var lastPayDate = new Date(
     new Date().getFullYear() + "-" + currentMonthIndex + "-" + "27"
   );
-  if (today > lastPayDate && global.paymentAmount !== 0) {
+  if (today > lastPayDate && paymentTotal !== "-") {
     global.paymentColor = "crimson";
   } else {
     global.paymentColor = "black";
+  }
+  if (new Date().getDate() < 10) {
+    if (global.currentMonthIndex ==  0) {
+      global.limitMonth = monthArray[11]
+    } 
+  } else {
+    global.limitMonth = monthArray[global.currentMonthIndex]
   }
 
   return (
@@ -112,7 +176,7 @@ const HomeScreen = () => {
           Acasă
         </Text>
         <Text style={{ fontSize: 17, fontWeight: "500" }}>
-          Bine ai venit, {global.user?.nume + " " + global.user?.prenume}!
+          Bine ai venit, {loggedUser?.nume + " " + loggedUser?.prenume}!
         </Text>
       </View>
       <View style={styles.address}>
@@ -120,7 +184,7 @@ const HomeScreen = () => {
           <FontAwesome5 name="building" size={24} color="black" />
           <View style={{ flex: 1 }}>
             <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 10 }}>
-              {global.user?.adresa + ", ap. " + global.user?.apartament}
+              {loggedUser?.adresa + ", ap. " + loggedUser?.apartament}
             </Text>
           </View>
         </View>
@@ -131,7 +195,7 @@ const HomeScreen = () => {
             <Text style={{ fontSize: 16, fontWeight: "500" }}>
               Total de plată:
             </Text>
-            <Text style={{ fontSize: 16 }}>{global.paymentAmount} lei</Text>
+            <Text style={{ fontSize: 16 }}>{paymentTotal} lei</Text>
           </View>
         </View>
         <View style={styles.iconText}>
@@ -141,7 +205,7 @@ const HomeScreen = () => {
           <Text
             style={{ fontSize: 16, marginTop: 10, color: global.paymentColor }}
           >
-            27 {global.previousMonth} 2021
+            20 {global.limitMonth} {global.currentYear}
           </Text>
         </View>
       </View>
@@ -150,7 +214,7 @@ const HomeScreen = () => {
           Transmitere index:
         </Text>
         <Text style={{ fontSize: 15 }}>
-          Indexul poate fi transmis în perioada 20 - 26 {global.currentMonth}{" "}
+          Indexul poate fi transmis în perioada 10 - 14 {global.currentMonth}{" "}
           {new Date().getFullYear()}.
         </Text>
         <TouchableOpacity

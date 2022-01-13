@@ -9,17 +9,14 @@ const LandingScreen = () => {
 
   auth.onAuthStateChanged((authState) => {
     const uid = auth.getUid();
-    console.log(uid)
     if (uid) {
       db.collection("admins")
         .get()
         .then((querySnapshot) => {
-          console.log("Total users: ", querySnapshot.size);
 
           querySnapshot.forEach((documentSnapshot) => {
             adminsDraft.push(documentSnapshot.id);
           });
-          console.log(adminsDraft);
           if (adminsDraft.includes(uid)) {
             navigation.navigate("AdminTab");
           } else {

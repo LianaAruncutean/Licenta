@@ -31,6 +31,7 @@ const InfoScreen = () => {
         querySnapshot.forEach((documentSnapshot) => {
           const anunt = documentSnapshot.data();
           anunturiTotal.push(anunt)
+          anunturiTotal.sort((a, b) => (a.data < b.data) ? 1 : -1)
         });
         setAnunturi(anunturiTotal);
       });

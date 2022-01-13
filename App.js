@@ -12,8 +12,10 @@ import TenantsListScreen from './screens/TenantsListScreen';
 import TenantDetail from './screens/TenantDetail';
 import LandingScreen from './screens/LandingScreen';
 import AdminBottomTabNavigator from './navigation/AdminTabNavigator';
+import {LogBox} from 'react-native';
 
 const Stack = createNativeStackNavigator();
+LogBox.ignoreAllLogs(); 
 
 export default function App() {
   return (
