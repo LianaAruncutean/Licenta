@@ -107,7 +107,7 @@ const InfoScreen = () => {
           Dată plată întreținere pentru luna curentă:
         </Text>
         <Text style={{ fontSize: 15, textAlign: "justify" }}>
-          27 Noiembrie 2021
+          29 Ianuarie 2022
         </Text>
         <Text
           style={{
