@@ -130,7 +130,7 @@ const HomeScreen = () => {
   };
 
   global.currentDay = new Date().getDate();
-  if (currentDay < 10 || currentDay > 15) {
+  if (currentDay < 24 || currentDay > 28) {
     global.indexFunction = handleIndexOutOfBounds;
   } else {
     global.indexFunction = handleIndexPress;
@@ -205,7 +205,7 @@ const HomeScreen = () => {
           <Text
             style={{ fontSize: 16, marginTop: 10, color: global.paymentColor }}
           >
-            20 {global.limitMonth} {global.currentYear}
+            29 {global.limitMonth} {new Date().getFullYear()}
           </Text>
         </View>
       </View>
@@ -214,7 +214,7 @@ const HomeScreen = () => {
           Transmitere index:
         </Text>
         <Text style={{ fontSize: 15 }}>
-          Indexul poate fi transmis în perioada 10 - 14 {global.currentMonth}{" "}
+          Indexul poate fi transmis în perioada 24 - 28 {global.currentMonth}{" "}
           {new Date().getFullYear()}.
         </Text>
         <TouchableOpacity

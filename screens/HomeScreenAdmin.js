@@ -132,12 +132,14 @@ const HomeScreenAdmin = () => {
       currentMonth = currentDate.getMonth() + 1
     }
     const dateDB = currentDay + "/" + currentMonth + "/" + currentDate.getFullYear()
-    db.collection("address").doc(selectedAddress).collection("announcements")
-    .add({
+    const newAnnouncement = {
       data: dateDB,
       text: description,
       titlu: title
-    })
+    }
+    setAnunturi([newAnnouncement, ...anunturi])
+    db.collection("address").doc(selectedAddress).collection("announcements")
+    .add(newAnnouncement)
     .then(() => console.log("Announcement added"))
     setTitle(null);
     setDescription(null);
