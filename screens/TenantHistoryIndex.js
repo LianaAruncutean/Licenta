@@ -257,7 +257,7 @@ const TenantHistoryIndex = () => {
                   style={{
                     fontWeight: "400",
                     fontSize: 15,
-                    marginLeft: 157,
+                    marginLeft: 151,
                     color: "#6b0000",
                   }}
                 >
