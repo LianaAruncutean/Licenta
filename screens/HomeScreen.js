@@ -7,13 +7,12 @@ import {
   View,
   StatusBar,
 } from "react-native";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import { auth, db } from "../firebase";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { showMessage } from "react-native-flash-message";
 
 const HomeScreen = () => {
-
   const uid = auth.getUid();
   const [paymentTotal, setPaymentTotal] = useState();
   const [loggedUser, setLoggedUser] = useState();
@@ -31,44 +30,56 @@ const HomeScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-    if (global.currentMonthIndex < 10) {
-      global.currentMonthIndex = "0" + global.currentMonthIndex
-    }
-    var docCurrent = (global.currentMonthIndex + 1) + '-' + new Date().getFullYear();
-    if (docCurrent.startsWith("00")) {
-      docCurrent = docCurrent.substring(1)
-    }
-    var docPreviousYear, docPreviousMonth
-    if (global.currentMonthIndex ==  0) {
-      docPreviousYear = new Date().getFullYear() - 1;
-      docPreviousMonth = 12
-    }
-    var docPrevious = docPreviousMonth + "-" + docPreviousYear
-    console.log(docPrevious + "    " + docCurrent)
-    db.collection("index").doc(uid).collection("indexList").doc(docCurrent)
-    .get()
-    .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          db.collection("index").doc(uid).collection("indexList").doc(docPrevious)
-          .onSnapshot(documentSnapshotPrev => {
-            const prevIndex = documentSnapshotPrev.data()
-            db.collection("index").doc(uid).collection("indexList").doc(docCurrent)
-            .onSnapshot(documentSnapshotCurrent => {
-              const currIndex = documentSnapshotCurrent.data()
-              var paymentValue;
-              paymentValue = (currIndex.receBaie - prevIndex.receBaie) * 2 + (currIndex.receBucatarie - prevIndex.receBucatarie) * 2
-                                    + (currIndex.caldaBaie - prevIndex.caldaBaie) * 2 + (currIndex.caldaBucatarie - prevIndex.caldaBucatarie) * 2;
-              setPaymentTotal(paymentValue)
-            })
-          })
-          
-        } else {
-          setPaymentTotal("-");
-        }
-        console.log(paymentTotal)
-    });
-  }, [])
-  )
+      if (global.currentMonthIndex < 10) {
+        global.currentMonthIndex = "0" + global.currentMonthIndex;
+      }
+      var docCurrent =
+        global.currentMonthIndex + 1 + "-" + new Date().getFullYear();
+      if (docCurrent.startsWith("00")) {
+        docCurrent = docCurrent.substring(1);
+      }
+      var docPreviousYear, docPreviousMonth;
+      if (global.currentMonthIndex == 0) {
+        docPreviousYear = new Date().getFullYear() - 1;
+        docPreviousMonth = 12;
+      }
+      var docPrevious = docPreviousMonth + "-" + docPreviousYear;
+      console.log(docPrevious + "    " + docCurrent);
+      db.collection("index")
+        .doc(uid)
+        .collection("indexList")
+        .doc(docCurrent)
+        .get()
+        .then((documentSnapshot) => {
+          if (documentSnapshot.exists) {
+            db.collection("index")
+              .doc(uid)
+              .collection("indexList")
+              .doc(docPrevious)
+              .onSnapshot((documentSnapshotPrev) => {
+                const prevIndex = documentSnapshotPrev.data();
+                db.collection("index")
+                  .doc(uid)
+                  .collection("indexList")
+                  .doc(docCurrent)
+                  .onSnapshot((documentSnapshotCurrent) => {
+                    const currIndex = documentSnapshotCurrent.data();
+                    var paymentValue;
+                    paymentValue =
+                      (currIndex.receBaie - prevIndex.receBaie) * 2 +
+                      (currIndex.receBucatarie - prevIndex.receBucatarie) * 2 +
+                      (currIndex.caldaBaie - prevIndex.caldaBaie) * 2 +
+                      (currIndex.caldaBucatarie - prevIndex.caldaBucatarie) * 2;
+                    setPaymentTotal(paymentValue);
+                  });
+              });
+          } else {
+            setPaymentTotal("-");
+          }
+          console.log(paymentTotal);
+        });
+    }, [])
+  );
 
   var monthArray = [
     "Ianuarie",
@@ -96,8 +107,8 @@ const HomeScreen = () => {
     // global.currentDay, global.indexFunction, global.currentYear, global.limitMonth, global.displayCald, global.disabled
     // global.messageExists, global.messageIndexOk, global.messageIndexOutOfBounds, global.displayAnn, global.displayTextAnn,
     // global.displayRequestedPhoto, global.displayNotRequested = undefined
-    loggedUser = undefined
-  }
+    loggedUser = undefined;
+  };
 
   const handleSignout = () => {
     auth
@@ -137,9 +148,9 @@ const HomeScreen = () => {
   }
 
   if (global.previousMonth == "Decembrie") {
-    global.currentYear = new Date().getFullYear() -1 
+    global.currentYear = new Date().getFullYear() - 1;
   } else {
-    global.currentYear = new Date().getFullYear()
+    global.currentYear = new Date().getFullYear();
   }
 
   var today = new Date(
@@ -154,11 +165,11 @@ const HomeScreen = () => {
     global.paymentColor = "black";
   }
   if (new Date().getDate() < 10) {
-    if (global.currentMonthIndex ==  0) {
-      global.limitMonth = monthArray[11]
-    } 
+    if (global.currentMonthIndex == 0) {
+      global.limitMonth = monthArray[11];
+    }
   } else {
-    global.limitMonth = monthArray[global.currentMonthIndex]
+    global.limitMonth = monthArray[global.currentMonthIndex];
   }
 
   return (
@@ -205,7 +216,7 @@ const HomeScreen = () => {
           <Text
             style={{ fontSize: 16, marginTop: 10, color: global.paymentColor }}
           >
-            29 {global.limitMonth} {new Date().getFullYear()}
+            29 {monthArray[currentMonthIndex]} {new Date().getFullYear()}
           </Text>
         </View>
       </View>

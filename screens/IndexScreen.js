@@ -95,6 +95,10 @@ const IndexScreen = () => {
         navigation.navigate("Dovadă", { screen: "Photo" });
     }
 
+    const handleHistoryPress = () => {
+        navigation.navigate("Contoare", { screen: "History" });
+    }
+
     const keyboardVerticalOffset = Platform.OS === 'ios' ? 5 : 0
 
     return (
@@ -183,6 +187,14 @@ const IndexScreen = () => {
                 >
                     <Text style={styles.buttonTextPhoto}>Încărcare Poză</Text>
                 </TouchableOpacity>
+                <View style={{ flexDirection: "row", marginRight: 20 }}>
+                    <TouchableOpacity
+                        style={styles.buttonHistory}
+                        onPress={handleHistoryPress}
+                    >
+                        <Text style={styles.buttonText}>Istoric Index</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -257,5 +269,16 @@ const styles = StyleSheet.create({
         color: "#6b0000",
         fontWeight: "500",
         textTransform: "uppercase"
-    }
+    },
+    buttonHistory: {
+        backgroundColor: "#6b0000",
+        width: "40%",
+        padding: 10,
+        borderRadius: 20,
+        alignItems: "center",
+        marginTop: 60,
+        marginLeft: 30,
+        borderWidth: 1,
+        borderColor: "#6b0000",
+      },
 })

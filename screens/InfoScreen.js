@@ -6,7 +6,6 @@ import {
   StatusBar,
   TouchableOpacity,
   FlatList,
-  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import Announcement from "./Announcement";
@@ -20,6 +19,9 @@ const InfoScreen = () => {
   };
 
   const [anunturi, setAnunturi] = useState([]);
+
+  global.monthArray = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
+  const monthToPay = monthArray[new Date().getMonth()]
 
   useEffect(() => {
     db.collection("address")
@@ -107,7 +109,7 @@ const InfoScreen = () => {
           Dată plată întreținere pentru luna curentă:
         </Text>
         <Text style={{ fontSize: 15, textAlign: "justify" }}>
-          29 Ianuarie 2022
+          29 {monthToPay} 2022
         </Text>
         <Text
           style={{
