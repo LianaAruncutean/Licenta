@@ -4,6 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import IndexScreen from '../screens/IndexScreen';
 import PhotoScreen from '../screens/PhotoScreen';
 import InfoScreen from '../screens/InfoScreen';
+import TenantHistoryIndex from "../screens/TenantHistoryIndex";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ const IndexTabStackNavigator = () => {
             <Stack.Screen options={ {headerShown: false} } name="Index" component={IndexScreen} />
             <Stack.Screen options={ {headerShown: false} } name="Home" component={HomeScreen} />
             <Stack.Screen options={ {headerShown: false} } name="Photo" component={PhotoScreen} />
+            <Stack.Screen options={ {headerShown: false} } name="History" component={TenantHistoryIndex} />
         </Stack.Navigator>
     )
 }
