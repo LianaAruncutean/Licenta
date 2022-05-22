@@ -12,6 +12,7 @@ import {
   StatusBar,
 } from "react-native";
 import { auth, db } from "../firebase";
+import { schedulePushNotification } from '../utils'
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +22,7 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     auth
       .signInWithEmailAndPassword(email, password)
       .then((userCredentials) => {
@@ -31,12 +32,13 @@ const LoginScreen = () => {
           db.collection("admins")
             .doc(uid)
             .get()
-            .then((documentSnapshot) => {
+            .then(async (documentSnapshot) => {
               if (documentSnapshot.exists === true) {
                 setIsAdmin(true);
                 navigation.navigate("AdminTab");
               } else {
                 navigation.navigate("Tab");
+                await schedulePushNotification(uid);
               }
             });
         }

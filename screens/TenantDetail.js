@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { showMessage } from "react-native-flash-message";
 import { db } from '../firebase';
 import * as firebase from "firebase";
+import { sendPushNotification } from '../utils';
 
 const TenantDetail = ( {route} ) => {
     
@@ -140,9 +141,10 @@ const TenantDetail = ( {route} ) => {
         global.displayButtonValue = "none";
     }
     
-    const hasToTakePhoto = () => {
+    const hasToTakePhoto = async () => {
         if (global.uid.id) {
         db.collection("users").doc(global.uid.id).update({hasToPhoto: true})
+        await sendPushNotification(global.uid.id, "APPartement", "Administratorul a solicitat o poză a contoarelor!")
         showMessage({
             message: "Solicitarea dumneavoastră a fost trimisă către locatar cu success!",
             floating: true,

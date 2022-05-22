@@ -13,6 +13,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import Announcement from "./Announcement";
 import DropDownPicker from "react-native-dropdown-picker";
 import { showMessage } from "react-native-flash-message";
+import { getTenantsUid, sendPushNotification } from "../utils";
 
 const HomeScreenAdmin = () => {
   const [uid, setUid] = useState(auth.getUid());
@@ -99,6 +100,8 @@ const HomeScreenAdmin = () => {
     global.displayDisplayPhoto, global.currentTenant, global.displayCald, global.displayButtonValue, global.imageView = undefined
   }
 
+  getTenantsUid();
+
   const handleSignout = () => {
     auth
       .signOut()
@@ -117,7 +120,7 @@ const HomeScreenAdmin = () => {
       setModalVisible(true)
   }
 
-  const addAnnouncementToDB = () => {
+  const addAnnouncementToDB = async () => {
     const currentDate = new Date();
     var currentDay = null;
     if (currentDate.getDate() < 10) {
@@ -138,9 +141,11 @@ const HomeScreenAdmin = () => {
       titlu: title
     }
     setAnunturi([newAnnouncement, ...anunturi])
-    db.collection("address").doc(selectedAddress).collection("announcements")
-    .add(newAnnouncement)
-    .then(() => console.log("Announcement added"))
+    await db.collection("address").doc(selectedAddress).collection("announcements").add(newAnnouncement)
+    const tenantsUids = await getTenantsUid()
+    for (let i = 0; i < tenantsUids.length; i++) {
+      await sendPushNotification(tenantsUids[i], "APPartement", "Administratorul a postat un nou anunț!")
+    }
     setTitle(null);
     setDescription(null);
     setModalVisible(!modalVisible)
