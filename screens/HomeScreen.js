@@ -51,7 +51,7 @@ const HomeScreen = () => {
         .doc(docCurrent)
         .get()
         .then((documentSnapshot) => {
-          if (documentSnapshot.exists) {
+          if (documentSnapshot.exists && loggedUser.hadPayed === false) {
             db.collection("index")
               .doc(uid)
               .collection("indexList")
@@ -102,14 +102,6 @@ const HomeScreen = () => {
 
   const navigation = useNavigation();
 
-  const clearEverything = () => {
-    // global.image, global.currentMonthIndex, global.paymentTotal, global.currentMonth, global.previousMonth,
-    // global.currentDay, global.indexFunction, global.currentYear, global.limitMonth, global.displayCald, global.disabled
-    // global.messageExists, global.messageIndexOk, global.messageIndexOutOfBounds, global.displayAnn, global.displayTextAnn,
-    // global.displayRequestedPhoto, global.displayNotRequested = undefined
-    loggedUser = undefined;
-  };
-
   const handleSignout = () => {
     auth
       .signOut()
@@ -139,6 +131,10 @@ const HomeScreen = () => {
   const goToInfos = () => {
     navigation.navigate("Informații", { screen: "Info" });
   };
+
+  const goToPaymentScreen = () => {
+    navigation.navigate("Acasă", {screen: "Payment"})
+  }
 
   global.currentDay = new Date().getDate();
   if (currentDay < 24 || currentDay > 28) {
@@ -219,6 +215,14 @@ const HomeScreen = () => {
             29 {monthArray[currentMonthIndex]} {new Date().getFullYear()}
           </Text>
         </View>
+        {paymentTotal !== '-' ? (
+          <TouchableOpacity
+          style={styles.indexButton}
+          onPress={goToPaymentScreen}
+          >
+          <Text style={styles.buttonText}>Efectuează plata</Text>
+          </TouchableOpacity>
+          ) : null}
       </View>
       <View style={styles.address}>
         <Text style={{ fontSize: 16, fontWeight: "500", marginBottom: 10 }}>
