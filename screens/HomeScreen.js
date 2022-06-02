@@ -51,7 +51,7 @@ const HomeScreen = () => {
         .doc(docCurrent)
         .get()
         .then((documentSnapshot) => {
-          if (documentSnapshot.exists && loggedUser.hadPayed === false) {
+          if (documentSnapshot.exists && loggedUser.hadPaid === false) {
             db.collection("index")
               .doc(uid)
               .collection("indexList")

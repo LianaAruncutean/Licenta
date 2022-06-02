@@ -56,7 +56,7 @@ const StripeAppScreen = () => {
           });
         } else if (paymentIntent) {
           console.log("Payment successful ", paymentIntent)
-          db.collection("users").doc(uid).update({hadPayed: true})
+          db.collection("users").doc(uid).update({hadPaid: true})
           .then(() => {
               showMessage({
                   message: "Poza doveditoare a fost transmisă către administrator cu succes!",
