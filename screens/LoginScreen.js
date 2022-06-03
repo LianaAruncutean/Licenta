@@ -59,12 +59,14 @@ const LoginScreen = () => {
           </View>
           <TextInput
             placeholder="Utilizator"
+            placeholderTextColor = "#6e6e6e"
             value={email}
             onChangeText={(text) => setEmail(text)}
             style={styles.input}
           />
           <TextInput
             placeholder="Parola"
+            placeholderTextColor = "#6e6e6e"
             value={password}
             onChangeText={(text) => setPassword(text)}
             style={styles.input}

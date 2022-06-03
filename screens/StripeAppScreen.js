@@ -47,7 +47,7 @@ const StripeAppScreen = () => {
         const { paymentIntent, error } = await confirmPayment(clientSecret, { type: "Card", billingDetails: billingDetails });
         if (error) {
           showMessage({
-            message: "Plata nu a fost realizată cu success!",
+            message: "A apărut o eroare! Plata nu a fost realizată cu success! :(",
             floating: true,
             position: "top",
             icon: "info",
@@ -59,7 +59,7 @@ const StripeAppScreen = () => {
           db.collection("users").doc(uid).update({hadPaid: true})
           .then(() => {
               showMessage({
-                  message: "Poza doveditoare a fost transmisă către administrator cu succes!",
+                  message: "Plata a fost efectuată cu succes!",
                   floating: true,
                   position: "top",
                   icon: "info",

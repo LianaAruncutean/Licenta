@@ -19,13 +19,11 @@ const IndexScreen = () => {
     const [caldaBucatarie, setCaldaBucatarie] = useState(0);
     const [docExist, setDocExist] = useState(false);
 
-    if (global.currentMonthIndex < 10) {
-        global.currentMonthIndex = "0" + global.currentMonthIndex
+    let currentMonthIndex = parseInt(global.currentMonthIndex) + 1
+    if (currentMonthIndex < 10) {
+        currentMonthIndex = "0" + currentMonthIndex
     }
-    if (global.currentMonthIndex.startsWith("00")) {
-        global.currentMonthIndex = global.currentMonthIndex.substring(1)
-    }
-    const doc = (global.currentMonthIndex + 1) + '-' + new Date().getFullYear();
+    const doc = currentMonthIndex + '-' + new Date().getFullYear();
 
     if (global.user.hasCentrala === true) {
         global.displayCald = "none";
@@ -276,7 +274,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 20,
         alignItems: "center",
-        marginTop: 60,
+        marginTop: 50,
         marginLeft: 30,
         borderWidth: 1,
         borderColor: "#6b0000",

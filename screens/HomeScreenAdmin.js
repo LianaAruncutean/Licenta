@@ -44,7 +44,13 @@ const HomeScreenAdmin = () => {
               querySnapshot.forEach((documentSnapshot) => {
                 const anunt = documentSnapshot.data();
                 anunturiTotal.push(anunt);
-                anunturiTotal.sort((a, b) => (a.data < b.data) ? 1 : -1)
+                // anunturiTotal.sort((a, b) => (a.data < b.data) ? 1 : -1)
+                anunturiTotal.sort((a,b) => {
+                  let firstDate = a.data.split('/').reverse().join('');
+                  let secondDate = b.data.split('/').reverse().join('');
+                  // return a1 > b1 ? 1 : a1 < b1 ? -1 : 0;
+                  return secondDate.localeCompare(firstDate); 
+                });
               });
               setAnunturi(anunturiTotal);
             });

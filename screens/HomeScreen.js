@@ -17,29 +17,27 @@ const HomeScreen = () => {
   const [paymentTotal, setPaymentTotal] = useState();
   const [loggedUser, setLoggedUser] = useState();
 
-  useEffect(() => {
-    const subscriber = db
-      .collection("users")
-      .doc(uid)
-      .onSnapshot((documentSnapshot) => {
-        setLoggedUser(documentSnapshot.data());
-      });
-    return () => subscriber();
-  }, [uid]);
   global.user = loggedUser;
 
   useFocusEffect(
     React.useCallback(() => {
-      if (global.currentMonthIndex < 10) {
-        global.currentMonthIndex = "0" + global.currentMonthIndex;
+      const fetchUser = async () => {
+        const result = await db.collection("users").doc(uid).get()
+        const userData = result.data()
+        setLoggedUser(userData)
+      }
+      fetchUser()
+      let currentMonthIndex = parseInt(global.currentMonthIndex) + 1
+      if (currentMonthIndex < 10) {
+        currentMonthIndex = "0" + currentMonthIndex
       }
       var docCurrent =
-        global.currentMonthIndex + 1 + "-" + new Date().getFullYear();
+        currentMonthIndex + "-" + new Date().getFullYear();
       if (docCurrent.startsWith("00")) {
         docCurrent = docCurrent.substring(1);
       }
       var docPreviousYear, docPreviousMonth;
-      if (global.currentMonthIndex == 0) {
+      if (parseInt(currentMonthIndex) === 1) {
         docPreviousYear = new Date().getFullYear() - 1;
         docPreviousMonth = 12;
       }
@@ -106,8 +104,6 @@ const HomeScreen = () => {
     auth
       .signOut()
       .then(() => {
-        // setLoggedUser(undefined)
-        // console.log(user)
         navigation.navigate("Login");
       })
       .catch((error) => alert(error.message));
