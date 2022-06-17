@@ -19,6 +19,20 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [loggedUser, setLoggedUser] = useState();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
+    return subscriber; 
+  }, []);
+
+  if (initializing) return null;
 
   const navigation = useNavigation();
 
