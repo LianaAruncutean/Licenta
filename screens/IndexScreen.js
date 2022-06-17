@@ -44,7 +44,7 @@ const IndexScreen = () => {
         global.messageIndexOutOfBounds = "none";
         global.messageIndexOk = "none";
     } else {
-        if (currentDay < 24 || currentDay > 28) {
+        if (currentDay < 17 || currentDay > 23) {
             global.messageIndexOutOfBounds = "flex";
             global.messageIndexOk = "none";
             global.disabled = "none";
@@ -111,7 +111,7 @@ const IndexScreen = () => {
                     <Text style={{fontSize: 15, display: global.messageIndexOk}}>Transmiterea indexului este aferentă lunii:</Text>
                     <Text style={{fontSize: 15, fontWeight: "500", marginTop: 5, color: "crimson", display: global.messageIndexOk}}>{global.currentMonth}</Text>
                     <Text style={{fontSize: 15, display: global.messageIndexOutOfBounds, textAlign: "justify"}}>Perioada de transmitere a indexului nu a început.</Text>
-                    <Text style={{fontSize: 15, display: global.messageIndexOutOfBounds, color: "crimson", marginTop: 7}}>Transmiterea indexului se poate face începând cu 24 {global.currentMonth}!</Text>
+                    <Text style={{fontSize: 15, display: global.messageIndexOutOfBounds, color: "crimson", marginTop: 7}}>Transmiterea indexului se poate face începând cu 18 {global.currentMonth}!</Text>
                     <Text style={{fontSize: 15, display: global.messageExists, color: "crimson"}}>Transmiterea indexului pentru luna {global.currentMonth} a fost deja efectuată!</Text>
                 </View>
                     <View style={{display: global.disabled}}>

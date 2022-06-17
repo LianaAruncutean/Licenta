@@ -49,7 +49,7 @@ const HomeScreen = () => {
         .doc(docCurrent)
         .get()
         .then((documentSnapshot) => {
-          if (documentSnapshot.exists && loggedUser.hadPaid === false) {
+          if (documentSnapshot.exists && loggedUser?.hadPaid === false) {
             db.collection("index")
               .doc(uid)
               .collection("indexList")
@@ -133,7 +133,7 @@ const HomeScreen = () => {
   }
 
   global.currentDay = new Date().getDate();
-  if (currentDay < 24 || currentDay > 28) {
+  if (currentDay < 17 || currentDay > 23) {
     global.indexFunction = handleIndexOutOfBounds;
   } else {
     global.indexFunction = handleIndexPress;
@@ -225,7 +225,7 @@ const HomeScreen = () => {
           Transmitere index:
         </Text>
         <Text style={{ fontSize: 15 }}>
-          Indexul poate fi transmis în perioada 24 - 28 {global.currentMonth}{" "}
+          Indexul poate fi transmis în perioada 18 - 22 {global.currentMonth}{" "}
           {new Date().getFullYear()}.
         </Text>
         <TouchableOpacity
