@@ -3,8 +3,9 @@ import React, {useState} from 'react'
 import { StripeProvider, CardField, useConfirmPayment } from '@stripe/stripe-react-native'
 import { showMessage } from "react-native-flash-message";
 import { db, auth } from '../firebase';
+import { useNavigation } from "@react-navigation/core";
 
-const API_URL = "http://192.168.100.10:3000";
+const API_URL = "http://192.168.100.11:3000";
 
 const StripeAppScreen = () => {
   const uid = auth.getUid()
@@ -12,6 +13,8 @@ const StripeAppScreen = () => {
   const [email, setEmail] = useState()
   const [cardDetails, setCardDetails] = useState()
   const { confirmPayment, loading } = useConfirmPayment()
+
+  const navigation = useNavigation();
 
   const fetchPaymentIntentClientSecret = async () => {
     const response = await fetch(`${API_URL}/create-payment-intent`, {
@@ -66,6 +69,7 @@ const StripeAppScreen = () => {
                   backgroundColor: "#6b0000",
                   color: "white"
               });
+              navigation.navigate("Acasă", { screen: "Home" });
           })
         .catch((error) => {
             console.log(error)

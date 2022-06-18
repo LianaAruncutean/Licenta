@@ -21,63 +21,71 @@ const HomeScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUser = async () => {
+      const calculate = async () => {
         const result = await db.collection("users").doc(uid).get()
         const userData = result.data()
+        console.log(userData)
         setLoggedUser(userData)
-      }
-      fetchUser()
-      let currentMonthIndex = parseInt(global.currentMonthIndex) + 1
-      if (currentMonthIndex < 10) {
-        currentMonthIndex = "0" + currentMonthIndex
-      }
-      var docCurrent =
+        let currentMonthIndex = parseInt(global.currentMonthIndex) + 1
+        if (currentMonthIndex < 10) {
+          currentMonthIndex = "0" + currentMonthIndex
+        }
+        var docCurrent =
         currentMonthIndex + "-" + new Date().getFullYear();
-      if (docCurrent.startsWith("00")) {
-        docCurrent = docCurrent.substring(1);
-      }
-      var docPreviousYear, docPreviousMonth;
-      if (parseInt(currentMonthIndex) === 1) {
-        docPreviousYear = new Date().getFullYear() - 1;
-        docPreviousMonth = 12;
-      }
-      var docPrevious = docPreviousMonth + "-" + docPreviousYear;
-      console.log(docPrevious + "    " + docCurrent);
-      db.collection("index")
+        if (docCurrent.startsWith("00")) {
+          docCurrent = docCurrent.substring(1);
+        }
+        var docPreviousYear, docPreviousMonth;
+        if (parseInt(currentMonthIndex) === 1) {
+          docPreviousYear = new Date().getFullYear() - 1;
+          docPreviousMonth = 12;
+        } else {
+          docPreviousYear = new Date().getFullYear()
+          if (parseInt(currentMonthIndex) <= 10) {
+            docPreviousMonth = "0" + (parseInt(currentMonthIndex) - 1)
+          } else {
+            docPreviousMonth = parseInt(currentMonthIndex) - 1
+          }
+        }
+        var docPrevious = docPreviousMonth + "-" + docPreviousYear;
+        console.log(docPrevious + "    " + docCurrent);
+        db.collection("index")
         .doc(uid)
         .collection("indexList")
         .doc(docCurrent)
         .get()
         .then((documentSnapshot) => {
-          if (documentSnapshot.exists && loggedUser?.hadPaid === false) {
+          if (documentSnapshot.exists && userData?.hadPaid === false) {
             db.collection("index")
+            .doc(uid)
+            .collection("indexList")
+            .doc(docPrevious)
+            .onSnapshot((documentSnapshotPrev) => {
+              const prevIndex = documentSnapshotPrev.data();
+              db.collection("index")
               .doc(uid)
               .collection("indexList")
-              .doc(docPrevious)
-              .onSnapshot((documentSnapshotPrev) => {
-                const prevIndex = documentSnapshotPrev.data();
-                db.collection("index")
-                  .doc(uid)
-                  .collection("indexList")
-                  .doc(docCurrent)
-                  .onSnapshot((documentSnapshotCurrent) => {
-                    const currIndex = documentSnapshotCurrent.data();
-                    var paymentValue;
-                    paymentValue =
-                      (currIndex.receBaie - prevIndex.receBaie) * 2 +
-                      (currIndex.receBucatarie - prevIndex.receBucatarie) * 2 +
-                      (currIndex.caldaBaie - prevIndex.caldaBaie) * 2 +
-                      (currIndex.caldaBucatarie - prevIndex.caldaBucatarie) * 2;
-                    setPaymentTotal(paymentValue);
-                  });
+              .doc(docCurrent)
+              .onSnapshot((documentSnapshotCurrent) => {
+                const currIndex = documentSnapshotCurrent.data();
+                var paymentValue;
+                paymentValue =
+                (currIndex.receBaie - prevIndex.receBaie) * 2 +
+                (currIndex.receBucatarie - prevIndex.receBucatarie) * 2 +
+                (currIndex.caldaBaie - prevIndex.caldaBaie) * 2 +
+                (currIndex.caldaBucatarie - prevIndex.caldaBucatarie) * 2;
+                setPaymentTotal(paymentValue);
               });
+            });
           } else {
             setPaymentTotal("-");
           }
           console.log(paymentTotal);
         });
-    }, [])
-  );
+      }
+      calculate()
+      }, [paymentTotal])
+      );
 
   var monthArray = [
     "Ianuarie",
