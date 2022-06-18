@@ -5,6 +5,7 @@ import IndexScreen from '../screens/IndexScreen';
 import PhotoScreen from '../screens/PhotoScreen';
 import InfoScreen from '../screens/InfoScreen';
 import TenantHistoryIndex from "../screens/TenantHistoryIndex";
+import StripeAppScreen from "../screens/StripeAppScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ const HomeTabStackNavigator = () => {
             <Stack.Screen options={ {headerShown: false} } name="Index" component={IndexScreen} />
             <Stack.Screen options={ {headerShown: false} } name="Photo" component={PhotoScreen} />
             <Stack.Screen options={ {headerShown: false} } name="Info" component={InfoScreen} />
+            <Stack.Screen options={ {headerShown: false} } name="Payment" component={StripeAppScreen} />
         </Stack.Navigator>
     )
 }

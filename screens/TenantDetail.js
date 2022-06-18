@@ -7,8 +7,8 @@ import { db } from '../firebase';
 import * as firebase from "firebase";
 import { sendPushNotification } from '../utils';
 
-const TenantDetail = ( {route} ) => {
-    
+const TenantDetail = ({ route }) => {
+
     global.uid = route.params;
 
     const [tenant, setTenant] = useState(null);
@@ -17,8 +17,12 @@ const TenantDetail = ( {route} ) => {
     const [value, setValue] = useState(null);
     const [items, setItems] = useState([]);
     const [index, setIndex] = useState(null);
-    const [imageURL, setImageURL] = useState(null);
-    
+    const [imageURL, setImageURL] = useState("");
+    const [displayPhoto, setDisplayPhoto] = useState({
+        displayRequestPhoto: "none",
+        displayDisplayPhoto: "none"
+    })
+
     const [modalVisible, setModalVisible] = useState(false);
 
     var monthArray = ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"];
@@ -26,107 +30,108 @@ const TenantDetail = ( {route} ) => {
 
     useEffect(() => {
         db.collection("users").doc(global.uid.id)
-        .onSnapshot(documentSnapshot => {
-            setTenant(documentSnapshot.data())
-        })
+            .onSnapshot(documentSnapshot => {
+                setTenant(documentSnapshot.data())
+            })
     }, [global.uid.id])
 
     const indexMonths = [];
     useEffect(() => {
-            db.collection("index").doc(global.uid.id).collection("indexList").get()
+        db.collection("index").doc(global.uid.id).collection("indexList").get()
             .then((querySnapshot) => {
                 querySnapshot.forEach(documentSnapshot => {
                     indexMonths.push(documentSnapshot.id)
                 })
                 setIndexList(indexMonths)
             })
-            
+
     }, [global.uid.id])
 
     useEffect(() => {
         const dateArray = []
-            indexList.forEach(stringDate => {
-                const splittedDate = stringDate.split("-")[0]
-                dateArray.push(splittedDate)
-            })
+        indexList.forEach(stringDate => {
+            const splittedDate = stringDate.split("-")[0]
+            dateArray.push(splittedDate)
+        })
 
-            global.monthArray = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
-            const listOfMonths = [];
-            dateArray.forEach(dateIndex => {
-                const monthObject = {
-                    label: monthArray[dateIndex-1],
-                    value: monthArray[dateIndex-1]
-                }
-                listOfMonths.push(monthObject);
-            })
-            setItems(listOfMonths)
-
-            if (value) {
-                var docYear, docMonth;
-                var docMonth = monthArray.indexOf(value) + 1;
-                if (docMonth < 10) {
-                    docMonth = "0" + docMonth
-                }
-                if (monthArray.indexOf(value) > new Date().getMonth()) {
-                    docYear = new Date().getFullYear() -1;
-                } else {
-                    docYear = new Date().getFullYear();
-                }
-                const docValue = docMonth + '-' + docYear;
-                const indexToDelete = ((monthArray.indexOf(value)-12))
-                // setValue(listOfMonths[listOfMonths.length + indexToDelete].label)
-                if (docValue) {db.collection("index").doc(global.uid.id).collection("indexList").doc(docValue)
-                .onSnapshot(documentSnapshot => {
-                    setIndex(documentSnapshot.data())
-            })}
-                
+        global.monthArray = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+        const listOfMonths = [];
+        dateArray.forEach(dateIndex => {
+            const monthObject = {
+                label: monthArray[dateIndex - 1],
+                value: monthArray[dateIndex - 1]
             }
-            
-    },[indexList, value])
+            listOfMonths.push(monthObject);
+        })
+        setItems(listOfMonths)
 
-    useEffect(() => {
+        if (value) {
+            var docYear, docMonth;
+            var docMonth = monthArray.indexOf(value) + 1;
+            if (docMonth < 10) {
+                docMonth = "0" + docMonth
+            }
+            if (monthArray.indexOf(value) > new Date().getMonth()) {
+                docYear = new Date().getFullYear() - 1;
+            } else {
+                docYear = new Date().getFullYear();
+            }
+            const docValue = docMonth + '-' + docYear;
+            const indexToDelete = ((monthArray.indexOf(value) - 12))
+            // setValue(listOfMonths[listOfMonths.length + indexToDelete].label)
+            if (docValue) {
+                db.collection("index").doc(global.uid.id).collection("indexList").doc(docValue)
+                    .onSnapshot(documentSnapshot => {
+                        setIndex(documentSnapshot.data())
+                    })
+            }
+
+        }
+
+    }, [indexList, value])
+
+    useEffect(async () => {
         var photoMonth = null
-        if (monthArray.indexOf(value) < 10) {
+        if (monthArray.indexOf(value) < 9) {
             photoMonth = "0" + (monthArray.indexOf(value) + 1)
         } else {
             photoMonth = monthArray.indexOf(value) + 1
         }
-        // if (photoMonth) {
-        //     if (photoMonth.startsWith("00")) {
-        //         photoMonth = photoMonth.substring(1)
-        //     }
-        // }
         var photoYear = null;
         if (value > currentMonth) {
             photoYear = new Date().getFullYear() - 1
         } else {
             photoYear = new Date().getFullYear()
         }
-        console.log(monthArray.indexOf(value))
-        const photoDate = photoMonth +  "-" + photoYear;
+
+        const photoDate = photoMonth + "-" + photoYear;
         const photoName = global.uid.id + "_" + photoDate;
-        const imageRef = firebase.storage().ref(photoName);
-        // const url = await ref.getDownloadURL();
-        imageRef.getDownloadURL().then((url) => {
-            console.log(url)
-            setImageURL(url)
-        })
-        .catch((e) => console.log('getting downloadURL of image error => ', e)); 
-    },[value])
 
-    if (imageURL) {
-        global.displayRequestPhoto = "none";
-        global.displayDisplayPhoto = "flex";
-    } else {
-        global.displayDisplayPhoto = "none";
-        global.displayRequestPhoto = "flex";
-    }
-
-    if (currentMonth !== value) {
-        global.displayRequestPhoto = "none";
-    } 
+        const fetchImageURL = async () => {
+            const imageRef = await firebase.storage().ref(photoName);
+            try {
+                var url = await imageRef.getDownloadURL()
+                setImageURL(url)
+                return url
+            } catch (e) {
+                setImageURL(null)
+                return null
+            }
+        }
+        const url = await fetchImageURL()
+        if (url) {
+            setDisplayPhoto({ displayRequestPhoto: "none", displayDisplayPhoto: "flex" })
+        } else {
+            if (currentMonth !== value) {
+                setDisplayPhoto({ displayRequestPhoto: "none", displayDisplayPhoto: "none" })
+            } else {
+                setDisplayPhoto({ displayRequestPhoto: "flex", displayDisplayPhoto: "none" })
+            }
+        }
+    }, [value])
 
     global.currentTenant = tenant;
+    
     if (global.currentTenant) {
         if (global.currentTenant.hasCentrala === true) {
             global.displayCald = "none";
@@ -140,19 +145,19 @@ const TenantDetail = ( {route} ) => {
     } else {
         global.displayButtonValue = "none";
     }
-    
+
     const hasToTakePhoto = async () => {
         if (global.uid.id) {
-        db.collection("users").doc(global.uid.id).update({hasToPhoto: true})
-        await sendPushNotification(global.uid.id, "APPartement", "Administratorul a solicitat o poză a contoarelor!")
-        showMessage({
-            message: "Solicitarea dumneavoastră a fost trimisă către locatar cu success!",
-            floating: true,
-            position: "top",
-            icon: "info",
-            backgroundColor: "#6b0000",
-            color: "white"
-        });
+            db.collection("users").doc(global.uid.id).update({ hasToPhoto: true })
+            await sendPushNotification(global.uid.id, "APPartement", "Administratorul a solicitat o poză a contoarelor!")
+            showMessage({
+                message: "Solicitarea dumneavoastră a fost trimisă către locatar cu success!",
+                floating: true,
+                position: "top",
+                icon: "info",
+                backgroundColor: "#6b0000",
+                color: "white"
+            });
         }
     }
 
@@ -162,7 +167,7 @@ const TenantDetail = ( {route} ) => {
         }
     }
 
-    if (imageURL) { 
+    if (imageURL) {
         global.imageView = "flex";
     } else {
         global.imageView = "none";
@@ -173,33 +178,33 @@ const TenantDetail = ( {route} ) => {
             <StatusBar barStyle="dark-content" backgroundColor="#ecf0f1" />
             <View style={styles.greetingView}>
                 <Text
-                style={{
-                    color: "#6b0000",
-                    fontSize: 28,
-                    fontWeight: "600",
-                    marginBottom: 10,
-                }}
+                    style={{
+                        color: "#6b0000",
+                        fontSize: 28,
+                        fontWeight: "600",
+                        marginBottom: 10,
+                    }}
                 >Vizualizare informații</Text>
             </View>
             <View style={styles.address}>
-                <View style={{marginTop: 10}}>
+                <View style={{ marginTop: 10 }}>
                     <View style={styles.iconText}>
-                        <Text  style={{fontSize: 15, fontWeight: '500'}}>Nume: </Text>
-                        <Text  style={{fontSize: 15, fontWeight: '500', color: "crimson"}}>{global.currentTenant?.nume + " " + global.currentTenant?.prenume}</Text>
+                        <Text style={{ fontSize: 15, fontWeight: '500' }}>Nume: </Text>
+                        <Text style={{ fontSize: 15, fontWeight: '500', color: "crimson" }}>{global.currentTenant?.nume + " " + global.currentTenant?.prenume}</Text>
                     </View>
                 </View>
-                <View style={{marginTop: 10, marginBottom: 10}}>
+                <View style={{ marginTop: 10, marginBottom: 10 }}>
                     <View style={styles.iconText}>
-                        <Text  style={{fontSize: 15, fontWeight: '500'}}>Apartament: </Text>
-                        <Text  style={{fontSize: 15, fontWeight: '500', color: "crimson"}}>{global.currentTenant?.apartament}</Text>
+                        <Text style={{ fontSize: 15, fontWeight: '500' }}>Apartament: </Text>
+                        <Text style={{ fontSize: 15, fontWeight: '500', color: "crimson" }}>{global.currentTenant?.apartament}</Text>
                     </View>
                 </View>
             </View>
             <View style={styles.address}>
                 <View style={styles.iconText}>
-                    <Text style={{fontSize: 15, fontWeight: '500'}}>Luna:</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '500' }}>Luna:</Text>
                     {/* <Text style={{fontSize: 15, fontWeight: '500', marginLeft: 195, color: "crimson"}}>Octombrie</Text> */}
-                    <View style={{width: "40%", marginLeft: 143}}>
+                    <View style={{ width: "40%", marginLeft: 143 }}>
                         <DropDownPicker
                             placeholder='Selectați o lună'
                             open={open}
@@ -212,73 +217,66 @@ const TenantDetail = ( {route} ) => {
                             maxHeight={80}
                         />
                     </View>
+                </View>
+                <View style={{ marginBottom: 15, marginTop: 10 }}>
+                    <View style={styles.iconText}>
+                        <MaterialIcons name="kitchen" size={20} color="black" />
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 10 }}>APĂ RECE bucătărie:</Text>
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 60, color: "#6b0000" }}>{index?.receBucatarie}</Text>
                     </View>
-                    <View style={{marginBottom: 15, marginTop: 10}}>
-                        <View style={styles.iconText}>
-                            <MaterialIcons name="kitchen" size={20} color="black"/>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>APĂ RECE bucătărie:</Text>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 60, color: "#6b0000"}}>{index?.receBucatarie}</Text>
-                        </View>
+                </View>
+                <View style={{ marginBottom: 15, display: global.displayCald }}>
+                    <View style={styles.iconText}>
+                        <MaterialIcons name="kitchen" size={20} color="black" />
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 10 }}>APĂ CALDĂ bucătărie:</Text>
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 50, color: "#6b0000" }}>{index?.caldaBucatarie}</Text>
                     </View>
-                    <View style={{marginBottom: 15, display: global.displayCald}}>
-                        <View style={styles.iconText}>
-                            <MaterialIcons name="kitchen" size={20} color="black"/>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>APĂ CALDĂ bucătărie:</Text>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 50, color: "#6b0000"}}>{index?.caldaBucatarie}</Text>
-                        </View>
+                </View>
+                <View style={{ marginBottom: 15 }}>
+                    <View style={styles.iconText}>
+                        <MaterialIcons name="kitchen" size={20} color="black" />
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 10 }}>APĂ RECE baie:</Text>
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 93, color: "#6b0000" }}>{index?.receBaie}</Text>
                     </View>
-                    <View style={{marginBottom: 15}}>
-                        <View style={styles.iconText}>
-                            <MaterialIcons name="kitchen" size={20} color="black"/>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>APĂ RECE baie:</Text>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 93, color: "#6b0000"}}>{index?.receBaie}</Text>
-                        </View>
+                </View>
+                <View style={{ marginBottom: 15, display: global.displayCald }}>
+                    <View style={styles.iconText}>
+                        <MaterialIcons name="kitchen" size={20} color="black" />
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 10 }}>APĂ CALDĂ baie:</Text>
+                        <Text style={{ fontWeight: "400", fontSize: 15, marginLeft: 83, color: "#6b0000" }}>{index?.caldaBaie}</Text>
                     </View>
-                    <View style={{marginBottom: 15, display: global.displayCald}}>
-                        <View style={styles.iconText}>
-                            <MaterialIcons name="kitchen" size={20} color="black"/>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>APĂ CALDĂ baie:</Text>
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 83, color: "#6b0000"}}>{index?.caldaBaie}</Text>
-                        </View>
-                    </View>
-                    {/* <View style={{marginBottom: 15}}>
-                        <View style={styles.iconText}>
-                            <FontAwesome5 name="piggy-bank" size={20} color="black" />
-                            <Text style={{fontWeight: "400", fontSize: 15, marginLeft: 10}}>Status plată</Text>
-                            <Text style={{fontWeight: "600", fontSize: 15, marginLeft: 114, color: "green"}}>OK</Text>
-                        </View>
-                    </View> */}
+                </View>
             </View>
-            <View style={{flexDirection: "row", marginRight: 20, display: global.displayButtonValue}}>
+            <View style={{ flexDirection: "row", marginRight: 20, display: global.displayButtonValue }}>
                 <Pressable
                     style={styles.indexButton}
                     onPress={viewPhoto}
-                    display={global.displayDisplayPhoto}
+                    display={displayPhoto.displayDisplayPhoto}
                 >
-                    <Text style={styles.buttonText} display={global.displayDisplayPhoto}>Vizualizare Poză</Text>
+                    <Text style={styles.buttonText} display={displayPhoto.displayDisplayPhoto}>Vizualizare Poză</Text>
                 </Pressable>
                 <Pressable
                     style={styles.button}
                     onPress={hasToTakePhoto}
-                    display={global.displayRequestPhoto}
+                    display={displayPhoto.displayRequestPhoto}
                 >
-                    <Text style={styles.buttonTextSignOut} display={global.displayRequestPhoto}>Solicită Poză</Text>
+                    <Text style={styles.buttonTextSignOut} display={displayPhoto.displayRequestPhoto}>Solicită Poză</Text>
                 </Pressable>
             </View>
             <View style={styles.centeredView}>
                 <Modal animationType="slide" transparent={true} visible={modalVisible}
-                onRequestClose={() => {
-                    Alert.alert("closed")
-                    setModalVisible(!modalVisible);
-                }}>
+                    onRequestClose={() => {
+                        Alert.alert("closed")
+                        setModalVisible(!modalVisible);
+                    }}>
                     <View style={styles.centeredView}>
                         <View style={styles.modalView}>
-                            <Image source={{uri: imageURL}} style={styles.image} display={global.imageView}/>
+                            <Image source={{ uri: imageURL }} style={styles.image} display={global.imageView} />
                             <Pressable
-                            style={[styles.buttonModal, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}
+                                style={[styles.buttonModal, styles.buttonClose]}
+                                onPress={() => setModalVisible(!modalVisible)}
                             >
-                            <Text style={styles.buttonTextSignOut}>Închide</Text>
+                                <Text style={styles.buttonTextSignOut}>Închide</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -294,7 +292,7 @@ const styles = StyleSheet.create({
     greetingView: {
         padding: 30,
         marginTop: 50,
-      },
+    },
     address: {
         paddingHorizontal: 15,
         paddingVertical: 5,
@@ -307,17 +305,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 5,
         shadowOffset: {
-          height: 1,
-          width: 1,
+            height: 1,
+            width: 1,
         },
         zIndex: 99,
-      },
-      iconText: {
+    },
+    iconText: {
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-      },
-      indexButton: {
+    },
+    indexButton: {
         backgroundColor: "white",
         width: "40%",
         padding: 10,
@@ -356,7 +354,7 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: "#6b0000",
         marginBottom: 20
-      },
+    },
     modalView: {
         marginTop: 70,
         marginHorizontal: 30,
@@ -372,7 +370,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5
-        },
+    },
     modalText: {
         marginBottom: 15,
         textAlign: "center"
@@ -382,7 +380,7 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingHorizontal: 15,
         elevation: 2
-      },
+    },
     buttonClose: {
         backgroundColor: "#6b0000",
     },

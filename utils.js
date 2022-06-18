@@ -45,7 +45,6 @@ export async function sendPushNotification (uid, title, body) {
 }
 
 export async function schedulePushNotification() {
-  console.log("aa")
   const id = await Notifications.scheduleNotificationAsync({
     content: {
       title: "APPartement",
@@ -60,6 +59,5 @@ export async function schedulePushNotification() {
         minute: 56,
       }},
   });
-  console.log("notif id on scheduling", id)
   return id;
 }

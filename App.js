@@ -76,7 +76,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
+      alert('Permisiunile pentru primirea notificărilor nu au fost acordate!');
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
@@ -89,7 +89,7 @@ async function registerForPushNotificationsAsync() {
         });
     }
   } else {
-    alert('Must use physical device for Push Notifications');
+    alert('Pentru a primi notificări este necesar un dispozitiv fizic!');
   }
 
   if (Platform.OS === 'android') {

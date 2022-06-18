@@ -19,13 +19,11 @@ const IndexScreen = () => {
     const [caldaBucatarie, setCaldaBucatarie] = useState(0);
     const [docExist, setDocExist] = useState(false);
 
-    if (global.currentMonthIndex < 10) {
-        global.currentMonthIndex = "0" + global.currentMonthIndex
+    let currentMonthIndex = parseInt(global.currentMonthIndex) + 1
+    if (currentMonthIndex < 10) {
+        currentMonthIndex = "0" + currentMonthIndex
     }
-    if (global.currentMonthIndex.startsWith("00")) {
-        global.currentMonthIndex = global.currentMonthIndex.substring(1)
-    }
-    const doc = (global.currentMonthIndex + 1) + '-' + new Date().getFullYear();
+    const doc = currentMonthIndex + '-' + new Date().getFullYear();
 
     if (global.user.hasCentrala === true) {
         global.displayCald = "none";
@@ -46,7 +44,7 @@ const IndexScreen = () => {
         global.messageIndexOutOfBounds = "none";
         global.messageIndexOk = "none";
     } else {
-        if (currentDay < 24 || currentDay > 28) {
+        if (currentDay < 17 || currentDay > 23) {
             global.messageIndexOutOfBounds = "flex";
             global.messageIndexOk = "none";
             global.disabled = "none";
@@ -113,7 +111,7 @@ const IndexScreen = () => {
                     <Text style={{fontSize: 15, display: global.messageIndexOk}}>Transmiterea indexului este aferentă lunii:</Text>
                     <Text style={{fontSize: 15, fontWeight: "500", marginTop: 5, color: "crimson", display: global.messageIndexOk}}>{global.currentMonth}</Text>
                     <Text style={{fontSize: 15, display: global.messageIndexOutOfBounds, textAlign: "justify"}}>Perioada de transmitere a indexului nu a început.</Text>
-                    <Text style={{fontSize: 15, display: global.messageIndexOutOfBounds, color: "crimson", marginTop: 7}}>Transmiterea indexului se poate face începând cu 24 {global.currentMonth}!</Text>
+                    <Text style={{fontSize: 15, display: global.messageIndexOutOfBounds, color: "crimson", marginTop: 7}}>Transmiterea indexului se poate face începând cu 18 {global.currentMonth}!</Text>
                     <Text style={{fontSize: 15, display: global.messageExists, color: "crimson"}}>Transmiterea indexului pentru luna {global.currentMonth} a fost deja efectuată!</Text>
                 </View>
                     <View style={{display: global.disabled}}>
@@ -276,7 +274,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 20,
         alignItems: "center",
-        marginTop: 60,
+        marginTop: 50,
         marginLeft: 30,
         borderWidth: 1,
         borderColor: "#6b0000",

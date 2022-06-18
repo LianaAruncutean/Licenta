@@ -48,7 +48,7 @@ const CameraScreen = () => {
                     >
                         <View style={styles.iconText}>
                             <MaterialIcons name="close" size={22} color="#6b0000" />
-                            <Text style={styles.buttonText}> Inchide </Text>
+                            <Text style={styles.buttonText}> Închide </Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity

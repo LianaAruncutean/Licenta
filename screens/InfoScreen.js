@@ -33,7 +33,11 @@ const InfoScreen = () => {
         querySnapshot.forEach((documentSnapshot) => {
           const anunt = documentSnapshot.data();
           anunturiTotal.push(anunt)
-          anunturiTotal.sort((a, b) => (a.data < b.data) ? 1 : -1)
+          anunturiTotal.sort((a,b) => {
+            let firstDate = a.data.split('/').reverse().join('');
+            let secondDate = b.data.split('/').reverse().join('');
+            return secondDate.localeCompare(firstDate); 
+          });
         });
         setAnunturi(anunturiTotal);
       });

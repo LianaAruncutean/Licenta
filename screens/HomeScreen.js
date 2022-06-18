@@ -17,29 +17,27 @@ const HomeScreen = () => {
   const [paymentTotal, setPaymentTotal] = useState();
   const [loggedUser, setLoggedUser] = useState();
 
-  useEffect(() => {
-    const subscriber = db
-      .collection("users")
-      .doc(uid)
-      .onSnapshot((documentSnapshot) => {
-        setLoggedUser(documentSnapshot.data());
-      });
-    return () => subscriber();
-  }, [uid]);
   global.user = loggedUser;
 
   useFocusEffect(
     React.useCallback(() => {
-      if (global.currentMonthIndex < 10) {
-        global.currentMonthIndex = "0" + global.currentMonthIndex;
+      const fetchUser = async () => {
+        const result = await db.collection("users").doc(uid).get()
+        const userData = result.data()
+        setLoggedUser(userData)
+      }
+      fetchUser()
+      let currentMonthIndex = parseInt(global.currentMonthIndex) + 1
+      if (currentMonthIndex < 10) {
+        currentMonthIndex = "0" + currentMonthIndex
       }
       var docCurrent =
-        global.currentMonthIndex + 1 + "-" + new Date().getFullYear();
+        currentMonthIndex + "-" + new Date().getFullYear();
       if (docCurrent.startsWith("00")) {
         docCurrent = docCurrent.substring(1);
       }
       var docPreviousYear, docPreviousMonth;
-      if (global.currentMonthIndex == 0) {
+      if (parseInt(currentMonthIndex) === 1) {
         docPreviousYear = new Date().getFullYear() - 1;
         docPreviousMonth = 12;
       }
@@ -51,7 +49,7 @@ const HomeScreen = () => {
         .doc(docCurrent)
         .get()
         .then((documentSnapshot) => {
-          if (documentSnapshot.exists) {
+          if (documentSnapshot.exists && loggedUser?.hadPaid === false) {
             db.collection("index")
               .doc(uid)
               .collection("indexList")
@@ -102,20 +100,10 @@ const HomeScreen = () => {
 
   const navigation = useNavigation();
 
-  const clearEverything = () => {
-    // global.image, global.currentMonthIndex, global.paymentTotal, global.currentMonth, global.previousMonth,
-    // global.currentDay, global.indexFunction, global.currentYear, global.limitMonth, global.displayCald, global.disabled
-    // global.messageExists, global.messageIndexOk, global.messageIndexOutOfBounds, global.displayAnn, global.displayTextAnn,
-    // global.displayRequestedPhoto, global.displayNotRequested = undefined
-    loggedUser = undefined;
-  };
-
   const handleSignout = () => {
     auth
       .signOut()
       .then(() => {
-        // setLoggedUser(undefined)
-        // console.log(user)
         navigation.navigate("Login");
       })
       .catch((error) => alert(error.message));
@@ -140,8 +128,12 @@ const HomeScreen = () => {
     navigation.navigate("Informații", { screen: "Info" });
   };
 
+  const goToPaymentScreen = () => {
+    navigation.navigate("Acasă", {screen: "Payment"})
+  }
+
   global.currentDay = new Date().getDate();
-  if (currentDay < 24 || currentDay > 28) {
+  if (currentDay < 17 || currentDay > 23) {
     global.indexFunction = handleIndexOutOfBounds;
   } else {
     global.indexFunction = handleIndexPress;
@@ -219,13 +211,21 @@ const HomeScreen = () => {
             29 {monthArray[currentMonthIndex]} {new Date().getFullYear()}
           </Text>
         </View>
+        {paymentTotal !== '-' ? (
+          <TouchableOpacity
+          style={styles.indexButton}
+          onPress={goToPaymentScreen}
+          >
+          <Text style={styles.buttonText}>Efectuează plata</Text>
+          </TouchableOpacity>
+          ) : null}
       </View>
       <View style={styles.address}>
         <Text style={{ fontSize: 16, fontWeight: "500", marginBottom: 10 }}>
           Transmitere index:
         </Text>
         <Text style={{ fontSize: 15 }}>
-          Indexul poate fi transmis în perioada 24 - 28 {global.currentMonth}{" "}
+          Indexul poate fi transmis în perioada 18 - 22 {global.currentMonth}{" "}
           {new Date().getFullYear()}.
         </Text>
         <TouchableOpacity
